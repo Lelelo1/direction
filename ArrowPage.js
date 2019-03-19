@@ -23,14 +23,15 @@ export default class ArrowPage extends Component {
                         }}
                         styles={{
                             container: {
-                                // maxHeight: '100%'
                                 flex: 0,
-                                width: '100%',
                                 position: 'absolute',
-                                zIndex: 1
+                                width: '100%',
+                                zIndex: 1,
+                            },
+                            listView: {
+                                backgroundColor: 'white'
                             }
                         }}
-                        listViewDisplayed='false'
                     />
                     <View style={{ flex: 1, width: '95%', alignItems: 'center', alignSelf: 'center', justifyContent: 'center' }}>
                         <AutoHeightImage source={require('./arrow.png')} width={scale(250)} style={{ transform: [{ rotate: '180deg' }] }} />
