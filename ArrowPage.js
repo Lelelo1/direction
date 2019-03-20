@@ -1,10 +1,12 @@
 import React, { Component, Fragment } from 'react';
-import { View, SafeAreaView, Text } from 'react-native';
+import { View, SafeAreaView, Text, PixelRatio } from 'react-native';
 import AutoHeightImage from 'react-native-auto-height-image';
+import ArrowPageModel from './ArrowPageModel';
 import { GooglePlacesAutocomplete } from 'react-native-google-places-autocomplete';
-import { scale } from 'react-native-size-matters';
+import { scale, moderateScale } from 'react-native-size-matters';
+import { inject, observer } from 'mobx-react';
 
-export default class ArrowPage extends Component {
+class ArrowPage extends Component {
     renderView() {
         return <View style={{ backgroundColor: 'grey', height: 200 }}></View>
     }
@@ -14,14 +16,17 @@ export default class ArrowPage extends Component {
                 <SafeAreaView style={{ flex: 0 }} />
                 <SafeAreaView style={{ flex: 1, justifyContent: 'flex-start', }}>
                     <GooglePlacesAutocomplete
-                        placeholder='hey'
+                        placeholder='search'
                         renderDescription={row => row.description}
                         query={{
                             key: 'AIzaSyBIHuu2CVqTKLmahKCE4wmHL3dStmIuViY',
                             radius: 1000,
-                            location: '-33.8670522,151.1957362'
+                            location: '57.708870,11.974560',
+                            strictbounds: 'strictbounds',
+                            sessiontoken: 'aqse34fr5hnj78l9g4s2svfbm377912kde'
                         }}
                         styles={{
+                            // to place suggestions on top
                             container: {
                                 flex: 0,
                                 position: 'absolute',
@@ -30,55 +35,53 @@ export default class ArrowPage extends Component {
                             },
                             listView: {
                                 backgroundColor: 'white'
+                            },
+                            // just for styling
+                            textInputContainer: {
+                                backgroundColor: 'white',
+                                height: 44,
+                                borderTopColor: '#7e7e7e',
+                                borderBottomColor: '#b5b5b5',
+                                borderTopWidth: 1 / PixelRatio.get(),
+                                borderBottomWidth: 1 / PixelRatio.get(),
+                                flexDirection: 'row',
+                            },
+                            row: {
+                                justifyContent: 'flex-end',
+                                alignItems: 'center',
+                                backgroundColor: '#f9f9f9'
+                            },
+                            poweredContainer: {
+                                justifyContent: 'flex-end',
+                                alignItems: 'center',
+                                backgroundColor: '#efefef',
                             }
-                        }}
+                            }}
+                            fetchDetails={true}
+                            onPress={(data, details) => {
+                                console.log(data, details);
+                                console.log('location: ' +  JSON.stringify(details.geometry.location));
+                                ArrowPageModel.getInstance().setDestination(details.geometry.location);
+                            }
+                        }
                     />
-                    <View style={{ flex: 1, width: '95%', alignItems: 'center', alignSelf: 'center', justifyContent: 'center' }}>
-                        <AutoHeightImage source={require('./arrow.png')} width={scale(250)} style={{ transform: [{ rotate: '180deg' }] }} />
+                    <View style={{ flex: 1, width: '93%', alignItems: 'center', alignSelf: 'center', justifyContent: 'center' }}>
+                        <View style={{ height: scale(250) * (3/4) }}>
+                        <AutoHeightImage source={require('./arrow.png')} width={scale(250)} style={{ transform: [{ rotate: this.props.arrowPageModel.rotate }] }} />
+                        </View>
+                        <Text style={{ fontSize: moderateScale(20) }} >amount of meters</Text>
                     </View>
+                    <View style={{ width: '93%', alignSelf: 'center' }}>
+                        <View style={{ flexDirection: 'row', justifyContent: 'space-between' }}>
+                            <Text>Left</Text>
+                            <Text>Right</Text>
+                        </View>
+                    </View>
+
                 </SafeAreaView>
             </Fragment>
         );
     }
 }
-/*
-<GooglePlacesAutocomplete
-                placeholder='hey'
-                renderDescription={row => row.description}
-                query={{
-                    key: 'AIzaSyBIHuu2CVqTKLmahKCE4wmHL3dStmIuViY',
-                    radius: 1000,
-                    location: '-33.8670522,151.1957362'
-                }}
-                styles={{
-                    container: {
-                        backgroundColor: 'purple',
-                        // maxHeight: '100%'
-                        flex: 0,
-                    },
-                    listView: {
-                        height: 300,
-                        backgroundColor: 'red'
-                    },
-                    poweredContainer: {
-                        backgroundColor: 'blue'
-                    },
-                    row: {
-                        backgroundColor: 'green'
-                    }
-                }}
-                listViewDisplayed='false'
-                />
-*/
-/** / ocupies area even though list view isen't displaying
- * <GooglePlacesAutocomplete
-                placeholder='heeeey'
-                renderDescription={row => row.description}
-                query={{
-                    key: 'AIzaSyBIHuu2CVqTKLmahKCE4wmHL3dStmIuViY',
-                    radius: 1000,
-                    location: '-33.8670522,151.1957362'
-                }}
-                style={{ backgroundColor: 'yellow', height: 300 }}
-                />
- */
+
+export default inject('arrowPageModel')(observer(ArrowPage));

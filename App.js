@@ -9,12 +9,18 @@
 import React, {Component} from 'react';
 import {Platform, StyleSheet, Text, View} from 'react-native';
 import ArrowPage from './ArrowPage';
+import ArrowPageModel from './ArrowPageModel';
+import { Provider } from 'mobx-react';
 
 type Props = {};
 export default class App extends Component<Props> {
   render() {
     return (
-      <ArrowPage />
+      <Provider
+        arrowPageModel={ArrowPageModel.getInstance()}
+      >
+        <ArrowPage />
+      </Provider>
     );
   }
 }
