@@ -1,6 +1,5 @@
 import { decorate, observable } from "mobx";
-
-// import RNSimpleCompass from 'react-native-simple-compass';
+import RNSimpleCompass from 'react-native-simple-compass';
 
 export default class ArrowPageModel {
     static instance = null;
@@ -15,14 +14,18 @@ export default class ArrowPageModel {
     setDestination(location) {
         if (location) {
             const degreeUpdateRate = 3;
-            /*
+            
             RNSimpleCompass.start(degreeUpdateRate, (degree) => {
-                console.log('degree:' + degree);
+                // console.log('degree:' + degree);
+                this.setRotate(270 - degree);
             });
-            */
+            
         }
     }
     rotate = '270deg'
+    setRotate(deg) {
+        this.rotate = deg + 'deg';
+    }
 }
 decorate(ArrowPageModel, {
     rotate: observable
