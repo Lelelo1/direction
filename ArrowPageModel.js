@@ -27,7 +27,9 @@ export default class ArrowPageModel {
     setRotate(deg) {
         this.rotate = deg + 'deg';
     }
+    radius = 5000;
 }
 decorate(ArrowPageModel, {
-    rotate: observable
+    rotate: observable,
+    radius: observable
 });

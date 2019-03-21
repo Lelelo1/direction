@@ -7,11 +7,14 @@
     "test": "jest"
   },
   "dependencies": {
+    "@react-native-community/slider": "^1.0.3",
     "mobx": "^5.9.0",
     "mobx-react": "^5.4.3",
     "react": "16.8.3",
     "react-native": "0.59.1",
+    "react-native-animatable": "^1.3.2",
     "react-native-auto-height-image": "^1.1.0",
+    "react-native-dialog": "^5.5.0",
     "react-native-gesture-handler": "^1.0.17",
     "react-native-google-places-autocomplete": "^1.3.9",
     "react-native-simple-compass": "^1.0.0",
