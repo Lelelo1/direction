@@ -14,12 +14,13 @@ export default class ArrowPageModel {
     setDestination(location) {
         if (location) {
             const degreeUpdateRate = 3;
-            
             RNSimpleCompass.start(degreeUpdateRate, (degree) => {
                 // console.log('degree:' + degree);
                 this.setRotate(270 - degree);
             });
-            
+        } else {
+            console.log('stopped');
+            RNSimpleCompass.stop();
         }
     }
     rotate = '270deg'

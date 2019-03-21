@@ -8,6 +8,7 @@ import {
     TouchableOpacity,
     ScrollView
 } from 'react-native';
+import Icon from 'react-native-vector-icons/MaterialIcons';
 import AutoHeightImage from 'react-native-auto-height-image';
 import ArrowPageModel from './ArrowPageModel';
 import { GooglePlacesAutocomplete } from 'react-native-google-places-autocomplete';
@@ -16,6 +17,10 @@ import { inject, observer } from 'mobx-react';
 
 class ArrowPage extends Component {
     
+    state = {
+        canClear: false
+    }
+
     render() {
         return (
             <Fragment>
@@ -27,7 +32,7 @@ class ArrowPage extends Component {
                         keyboardShouldPersistTaps={'handled'}
                     >
                         <GooglePlacesAutocomplete
-                            ref={(g) => this.googlePlacesAutocomplete = g}
+                            ref={(g) => { this.googlePlacesAutocomplete = g; }}
                             placeholder='search'
                             renderDescription={row => row.description}
                             query={{
@@ -74,17 +79,28 @@ class ArrowPage extends Component {
                             onPress={(data, details) => {
                                 console.log(data, details);
                                 ArrowPageModel.getInstance().setDestination(details.geometry.location);
+                                this.setState({ canClear: true });
                             }}
                             onClear={() => {
-                                console.log('cleared/unselected');
+                                ArrowPageModel.getInstance().setDestination(null);
+                                this.setState({ canClear: false });
                             }}
                             textInputProps={{ clearButtonMode: 'never' }}
                         />
 
                         <View style={{ height: 44, width: '100%' }} />
                         
-                        <Text>I am below</Text>
-                        <TextInput placeholder={'heeeya'} />
+                        <View style={{ alignItems: 'flex-end', paddingTop: moderateScale(13), paddingRight: moderateScale(13) }}>
+                            <TouchableOpacity
+                            disabled={!this.state.canClear}
+                            onPress={() => {
+                                this.googlePlacesAutocomplete.setAddressText('');
+                                this.setState({ canClear: false });
+                            }}
+                            >
+                                <Icon name={'clear'} size={scale(33)} color={this.state.canClear ? 'black' : 'transparent'} />
+                            </TouchableOpacity>
+                        </View>
                         <View style={{ flex: 1, width: '93%', alignItems: 'center', alignSelf: 'center', justifyContent: 'center' }}>
 
                             <View style={{ height: scale(200) * (3 / 4) }}>
@@ -93,12 +109,6 @@ class ArrowPage extends Component {
                             <Text style={{ fontSize: moderateScale(20) }} >amount of meters</Text>
                         </View>
                         <View style={{ width: '93%', alignSelf: 'center' }}>
-                            <Text
-                                onPress={() => {
-                                    console.log('pressed');
-                                    this.googlePlacesAutocomplete.setAddressText('');
-                                }}
-                            >clear</Text>
                             <View style={{ flexDirection: 'row', justifyContent: 'space-between' }}>
                                 <Text>Left</Text>
                                 <Text>Right</Text>
