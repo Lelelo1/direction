@@ -1,5 +1,13 @@
 import React, { Component, Fragment } from 'react';
-import { View, SafeAreaView, Text, PixelRatio, TextInput, TouchableOpacity, TouchableWithoutFeedback, Keyboard, ScrollView } from 'react-native';
+import {
+    View,
+    SafeAreaView,
+    Text,
+    PixelRatio,
+    TextInput,
+    TouchableOpacity,
+    ScrollView
+} from 'react-native';
 import AutoHeightImage from 'react-native-auto-height-image';
 import ArrowPageModel from './ArrowPageModel';
 import { GooglePlacesAutocomplete } from 'react-native-google-places-autocomplete';
@@ -13,7 +21,11 @@ class ArrowPage extends Component {
             <Fragment>
                 <SafeAreaView style={{ flex: 0 }} />
                 <SafeAreaView style={{ flex: 1, justifyContent: 'flex-start' }}>
-                    <ScrollView contentContainerStyle={{ flex: 1 }}>
+                    <ScrollView
+                        contentContainerStyle={{ flex: 1 }}
+                        keyboardDismissMode={'none'}
+                        keyboardShouldPersistTaps={'handled'}
+                    >
                         <GooglePlacesAutocomplete
                             ref={(g) => this.googlePlacesAutocomplete = g}
                             placeholder='search'
@@ -70,6 +82,7 @@ class ArrowPage extends Component {
                         />
 
                         <View style={{ height: 44, width: '100%' }} />
+                        
                         <Text>I am below</Text>
                         <TextInput placeholder={'heeeya'} />
                         <View style={{ flex: 1, width: '93%', alignItems: 'center', alignSelf: 'center', justifyContent: 'center' }}>
@@ -126,4 +139,16 @@ export default inject('arrowPageModel')(observer(ArrowPage));
                 this.props.onSubmitEditing()
                 this.setState({listViewDisplayed: false});
               }}
+
+    hiding listview when keyboard dismissed:
+    _keyboardDidHide() {
+    console.log('hid keyboard');
+    this.setState({ listViewDisplayed: false });
+
+    componentWillMound
+    this.keyboardDidHideListener = Keyboard.addListener('keyboardDidHide', this._keyboardDidHide);
+
+    componentWillUnmount
+    this.keyboardDidHideListener.remove();
+  }
  */
