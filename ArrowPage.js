@@ -15,6 +15,7 @@ import { GooglePlacesAutocomplete } from 'react-native-google-places-autocomplet
 import { scale, moderateScale } from 'react-native-size-matters';
 import { inject, observer } from 'mobx-react';
 
+
 class ArrowPage extends Component {
     /*
     static navigationOptions = {
@@ -24,7 +25,6 @@ class ArrowPage extends Component {
     state = {
         canClear: false
     }
-
     render() {
         return (
             <ScrollView
@@ -39,7 +39,7 @@ class ArrowPage extends Component {
                     renderDescription={row => row.description}
                     query={{
                         key: 'AIzaSyBIHuu2CVqTKLmahKCE4wmHL3dStmIuViY',
-                        radius: this.props.arrowPageModel.distance,
+                        radius: this.props.arrowPageModel.radius,
                         location: '57.708870,11.974560',
                         strictbounds: 'strictbounds',
                         sessiontoken: 'aqse34fr5hnj78l9g4s2svfbm377912kde'
@@ -107,7 +107,7 @@ class ArrowPage extends Component {
                     onPress={() => {
                         this.props.navigation.navigate('Settings');
                     }}
-                    style={{width: 50, height: 50, backgroundColor: 'orange' }}
+                    style={{ width: 50, height: 50, backgroundColor: 'orange' }}
                 >
                     <Text>To Settings</Text>
                 </TouchableOpacity>
@@ -127,6 +127,7 @@ class ArrowPage extends Component {
             </ScrollView>
         );
     }
+    
 }
 
 export default inject('arrowPageModel')(observer(ArrowPage));

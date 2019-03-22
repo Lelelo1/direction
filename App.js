@@ -14,15 +14,16 @@ import ArrowPageModel from './ArrowPageModel';
 import { Provider } from 'mobx-react';
 import { createAppContainer, createBottomTabNavigator, createStackNavigator } from 'react-navigation';
 import SettingsPage from './SettingsPage';
+import SwipeNavigation from './SwipeNavigation';
 
-const arrowNavigation = createStackNavigator({
-  Arrow: { screen: ArrowPage },
+const stackNavigator = createStackNavigator({
+  Swipe: { screen: SwipeNavigation },
   Settings: { screen: SettingsPage }
 },
 {
-  initialRouteKey: 'Arrow'
+  initialRouteKey: 'Swipe'
 });
-
+/* can't swipe between tabs on ios
 const tabs = createBottomTabNavigator({
   Explore: { screen: ExplorePage },
   Arrow: { screen: arrowNavigation }
@@ -30,7 +31,8 @@ const tabs = createBottomTabNavigator({
 {
   initialRouteName: 'Arrow'
 });
-const AppContainer = createAppContainer(tabs);
+*/
+const AppContainer = createAppContainer(stackNavigator);
 
 export default class App extends Component {
   render() {
