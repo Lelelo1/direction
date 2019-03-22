@@ -15,11 +15,14 @@ export default class SettingsPage extends Component {
     }
 
     state = {
+        initialValue: 0,
         distance: this.meterConverter(ArrowPageModel.getInstance().radius),
         enableButton: false,
         showDialog: false,
     }
-    
+    componentDidMount() {
+        this.setState({ initialValue: ArrowPageModel.getInstance().radius / this.MAX_VALUE });
+    }
     setDistance(val) {
         const v = val * this.MAX_VALUE;
         const m = Math.round(v);
@@ -92,8 +95,7 @@ export default class SettingsPage extends Component {
                     onValueChange={(value) => {
                         this.setDistance(value);
                     }}
-                    value={ArrowPageModel.getInstance().radius / this.MAX_VALUE}
-                    
+                    value={this.state.initialValue}
                 />
                 <Animatable.View ref={(r) => { this.moreButton = r }} style={{ alignSelf: 'flex-start' }}>
                     <TouchableOpacity

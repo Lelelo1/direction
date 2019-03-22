@@ -37,6 +37,7 @@ class ArrowPage extends Component {
                     ref={(g) => { this.googlePlacesAutocomplete = g; }}
                     placeholder='search'
                     renderDescription={row => row.description}
+                    nearbyPlacesAPI='GooglePlacesSearch'
                     query={{
                         key: 'AIzaSyBIHuu2CVqTKLmahKCE4wmHL3dStmIuViY',
                         radius: this.props.arrowPageModel.radius,
@@ -44,6 +45,13 @@ class ArrowPage extends Component {
                         strictbounds: 'strictbounds',
                         sessiontoken: 'aqse34fr5hnj78l9g4s2svfbm377912kde'
                     }}
+                    /* can't use this
+                    https://github.com/FaridSafi/react-native-google-places-autocomplete/issues/373
+                    GooglePlacesSearchQuery={{
+                        type: 'cafe',
+                        locationbias: this.props.arrowPageModel.radius
+                    }}
+                    */
                     styles={{
                         // to place suggestions on top
                         container: {
@@ -92,7 +100,7 @@ class ArrowPage extends Component {
 
                 <View style={{ height: 44, width: '100%' }} />
 
-                <View style={{ alignItems: 'flex-end', paddingTop: moderateScale(13), paddingRight: moderateScale(13) }}>
+                <View style={{ alignItems: 'flex-end', paddingTop: moderateScale(11), paddingRight: moderateScale(11) }}>
                     <TouchableOpacity
                         disabled={!this.state.canClear}
                         onPress={() => {
@@ -103,14 +111,6 @@ class ArrowPage extends Component {
                         <Icon name={'clear'} size={scale(33)} color={this.state.canClear ? 'black' : 'transparent'} />
                     </TouchableOpacity>
                 </View>
-                <TouchableOpacity
-                    onPress={() => {
-                        this.props.navigation.navigate('Settings');
-                    }}
-                    style={{ width: 50, height: 50, backgroundColor: 'orange' }}
-                >
-                    <Text>To Settings</Text>
-                </TouchableOpacity>
                 <View style={{ flex: 1, width: '93%', alignItems: 'center', alignSelf: 'center', justifyContent: 'center' }}>
 
                     <View style={{ height: scale(200) * (3 / 4) }}>
