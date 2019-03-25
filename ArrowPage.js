@@ -14,6 +14,7 @@ import ArrowPageModel from './ArrowPageModel';
 import { GooglePlacesAutocomplete } from 'react-native-google-places-autocomplete';
 import { scale, moderateScale } from 'react-native-size-matters';
 import { inject, observer } from 'mobx-react';
+import Utils from './Utils';
 
 
 class ArrowPage extends Component {
@@ -39,10 +40,10 @@ class ArrowPage extends Component {
                     renderDescription={row => row.description}
                     nearbyPlacesAPI='GooglePlacesSearch'
                     query={{
-                        key: 'AIzaSyBIHuu2CVqTKLmahKCE4wmHL3dStmIuViY',
-                        radius: this.props.arrowPageModel.radius,
+                        key: Utils.getInstance().key,
+                        radius: this.props.arrowPageModel.getRadius(),
                         location: '57.708870,11.974560',
-                        strictbounds: 'strictbounds',
+                        strictbounds: this.props.arrowPageModel.getRadius() ? 'strictbounds' : undefined,
                         sessiontoken: 'aqse34fr5hnj78l9g4s2svfbm377912kde'
                     }}
                     /* can't use this
@@ -84,6 +85,7 @@ class ArrowPage extends Component {
                             backgroundColor: '#efefef',
                         }
                     }}
+                    // predefinedPlaced={this.props.arrowPageModel.predefinedPlaced} dont work
                     listViewDisplayed={false}
                     fetchDetails={true}
                     onPress={(data, details) => {
@@ -114,9 +116,15 @@ class ArrowPage extends Component {
                 <View style={{ flex: 1, width: '93%', alignItems: 'center', alignSelf: 'center', justifyContent: 'center' }}>
 
                     <View style={{ height: scale(200) * (3 / 4) }}>
-                        <AutoHeightImage source={require('./arrow.png')} width={scale(200)} style={{ transform: [{ rotate: this.props.arrowPageModel.rotate }] }} />
+                        <AutoHeightImage
+                            source={require('./arrow.png')}
+                            width={scale(200)}
+                            style={{
+                                transform: [{ rotate: this.props.arrowPageModel.rotate }]
+                            }}
+                        />
                     </View>
-                    <Text style={{ fontSize: moderateScale(20) }} >amount of meters</Text>
+                    <Text style={{ fontSize: moderateScale(20) }}>amount of meters</Text>
                 </View>
                 <View style={{ width: '93%', alignSelf: 'center' }}>
                     <View style={{ flexDirection: 'row', justifyContent: 'space-between' }}>

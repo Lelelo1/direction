@@ -1,5 +1,6 @@
 import { decorate, observable } from "mobx";
 import RNSimpleCompass from 'react-native-simple-compass';
+import Utils from './Utils';
 
 export default class ArrowPageModel {
     static instance = null;
@@ -27,9 +28,19 @@ export default class ArrowPageModel {
     setRotate(deg) {
         this.rotate = deg + 'deg';
     }
+
     radius = 5000;
+    getRadius() {
+        if (this.radius > 10) {
+            return this.radius;
+        }
+        return undefined;
+    }
+
+    predefinedPlaces = [];
 }
 decorate(ArrowPageModel, {
     rotate: observable,
-    radius: observable
+    radius: observable,
+    predefinedPlaces: observable
 });
