@@ -8,14 +8,17 @@ import {
     TouchableOpacity,
     ScrollView
 } from 'react-native';
+// import Swipeout from 'react-native-swipeout';
+import Qs from 'qs';
 import Icon from 'react-native-vector-icons/MaterialIcons';
+import InfoIcon from 'react-native-vector-icons/Feather';
 import AutoHeightImage from 'react-native-auto-height-image';
 import ArrowPageModel from './ArrowPageModel';
 import { GooglePlacesAutocomplete } from 'react-native-google-places-autocomplete';
 import { scale, moderateScale } from 'react-native-size-matters';
 import { inject, observer } from 'mobx-react';
+import { toJS } from 'mobx';
 import Utils from './Utils';
-
 
 class ArrowPage extends Component {
     /*
@@ -24,7 +27,37 @@ class ArrowPage extends Component {
     }
     */
     state = {
-        canClear: false
+        canClear: false,
+    }
+    renderSwipeoutButtons(rowData) {
+        /*
+        return [
+            {
+                text: 'press',
+                onPress: () => {
+                    console.log('rowData: ' + JSON.stringify(rowData));
+                    fetch('https://maps.googleapis.com/maps/api/place/details/json?' + Qs.stringify({
+                        key: Utils.getInstance().key,
+                        placeid: rowData.place_id
+                        // language: this.props.query.language,
+                    })).then((response) => response.json()).then((details) => {
+                        console.log('details: ' + JSON.stringify(details));
+                    });
+                    
+                    // console.log('details: ' + JSON.stringify(this.selectedItem.details));
+                }
+            }
+        ];*/
+        return [
+            {
+                component: (
+                    <View style={{ flex: 1, justifyContent: 'center', alignSelf: 'center' }}>
+                        <Icon name={'info'} size={33} />
+                    </View>
+                )
+                
+            }
+        ];
     }
     render() {
         return (
@@ -85,19 +118,26 @@ class ArrowPage extends Component {
                             backgroundColor: '#efefef',
                         }
                     }}
-                    // predefinedPlaced={this.props.arrowPageModel.predefinedPlaced} dont work
+                    predefinedPlaces={this.props.arrowPageModel.predefinedPlaces}
+                    predefinedPlacesAlwaysVisible={true}
                     listViewDisplayed={false}
                     fetchDetails={true}
                     onPress={(data, details) => {
-                        console.log(data, details);
-                        ArrowPageModel.getInstance().setDestination(details.geometry.location);
+                        console.log(JSON.stringify(data), JSON.stringify(details));
+                        // ArrowPageModel.getInstance().setDestination(details.geometry.location);
                         this.setState({ canClear: true });
+
+                    }}
+                    onLongPress={(data, details) => {
+                        console.log('long hold: ' + JSON.stringify(data), JSON.stringify(details));
                     }}
                     onClear={() => {
                         ArrowPageModel.getInstance().setDestination(null);
                         this.setState({ canClear: false });
                     }}
                     textInputProps={{ clearButtonMode: 'never' }}
+                    renderSwipeoutButtons={(rowData) => this.renderSwipeoutButtons(rowData)}
+                    buttonWidth={scale(55)}
                 />
 
                 <View style={{ height: 44, width: '100%' }} />

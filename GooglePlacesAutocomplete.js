@@ -15,6 +15,7 @@ import {
   PixelRatio,
   Keyboard
 } from 'react-native';
+import Swipeout from 'react-native-swipeout';
 import Qs from 'qs';
 import debounce from 'lodash.debounce';
 
@@ -222,7 +223,7 @@ export default class GooglePlacesAutocomplete extends Component {
     );
   }
 
-  _onPress = (rowData) => {
+  _onActivate = (rowData, fireEvent, eventType) => {
     if (rowData.isPredefinedPlace !== true && this.props.fetchDetails === true) {
       if (rowData.isLoading === true) {
         // already requesting
@@ -249,14 +250,21 @@ export default class GooglePlacesAutocomplete extends Component {
             if (this._isMounted === true) {
               const details = responseJSON.result;
               this._disableRowLoaders();
-              this._onBlur();
-
+              // this._onBlur(); 
+              if(eventType === 'onPress') {
+                this._onBlur();  // hides the listView  
+              } else if (eventType === 'onLongPress') {
+                this.triggerBlur();
+              } 
+              
+              
               this.setState({
                 text: this._renderDescription( rowData ),
               });
 
-              delete rowData.isLoading;
-              this.props.onPress(rowData, details);
+                delete rowData.isLoading;
+              // this.pr  ops.onPress(rowData, details);
+              fireEvent(rowData, details);
             }
           } else {
             this._disableRowLoaders();
@@ -286,7 +294,6 @@ export default class GooglePlacesAutocomplete extends Component {
           }
         }
       };
-
       request.open('GET', 'https://maps.googleapis.com/maps/api/place/details/json?' + Qs.stringify({
         key: this.props.query.key,
         placeid: rowData.place_id,
@@ -319,8 +326,11 @@ export default class GooglePlacesAutocomplete extends Component {
       delete rowData.isLoading;
       let predefinedPlace = this._getPredefinedPlace(rowData);
 
+      /*
       // sending predefinedPlace as details for predefined places
       this.props.onPress(predefinedPlace, predefinedPlace);
+      */
+     fireEvent(predefinedPlace, predefinedPlace);
     }
   }
 
@@ -566,9 +576,9 @@ export default class GooglePlacesAutocomplete extends Component {
 
     return null;
   }
-
   _renderRow = (rowData = {}, sectionID, rowID) => {
     return (
+      /*
       <ScrollView
         style={{ flex: 1 }}
         scrollEnabled={this.props.isRowScrollable}
@@ -587,6 +597,28 @@ export default class GooglePlacesAutocomplete extends Component {
           </View>
         </TouchableHighlight>
       </ScrollView>
+      */
+      <Swipeout
+        right={this.props.renderSwipeoutButtons(rowData)}
+        buttonWidth={this.props.buttonWidth}
+        scroll={this.props.onSwipeoutScroll}
+      >
+        <TouchableHighlight
+          style={{ width: WINDOW.width }}
+          onPress={() => {
+            this._onActivate(rowData, this.props.onPress, 'onPress');
+          }}
+          onLongPress={() => {
+            this._onActivate(rowData, this.props.onLongPress, 'onLongHold');
+          }}
+          underlayColor={this.props.listUnderlayColor || "#c8c7cc"}
+        >
+          <View style={[this.props.suppressDefaultStyles ? {} : defaultStyles.row, this.props.styles.row, rowData.isPredefinedPlace ? this.props.styles.specialItemRow : {}]}>
+            {this._renderRowData(rowData)}
+            {this._renderLoader(rowData)}
+          </View>
+        </TouchableHighlight>
+      </Swipeout>
     );
   }
 
@@ -736,6 +768,8 @@ GooglePlacesAutocomplete.propTypes = {
   onPress: PropTypes.func,
   onNotFound: PropTypes.func,
   onFail: PropTypes.func,
+  onClear: PropTypes.func,
+  onLongPress: PropTypes.func,
   minLength: PropTypes.number,
   fetchDetails: PropTypes.bool,
   autoFocus: PropTypes.bool,
@@ -761,6 +795,7 @@ GooglePlacesAutocomplete.propTypes = {
   renderRow: PropTypes.func,
   renderLeftButton: PropTypes.func,
   renderRightButton: PropTypes.func,
+  renderSwipeoutButtons: PropTypes.func,
   listUnderlayColor: PropTypes.string,
   debounce: PropTypes.number,
   isRowScrollable: PropTypes.bool,
@@ -780,6 +815,8 @@ GooglePlacesAutocomplete.defaultProps = {
   onPress: () => {},
   onNotFound: () => {},
   onFail: () => {},
+  onClear: () => {},
+  onLongPress:() => {},
   minLength: 0,
   fetchDetails: false,
   autoFocus: false,
@@ -816,6 +853,9 @@ GooglePlacesAutocomplete.defaultProps = {
   numberOfLines: 1,
   onSubmitEditing: () => {
     
+  },
+  renderSwipeoutButtons: (rowData, details) => {
+    return null;
   },
   editable: true
 }
