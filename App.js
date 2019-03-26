@@ -14,10 +14,11 @@ import ArrowPageModel from './ArrowPageModel';
 import { Provider } from 'mobx-react';
 import { createAppContainer, createBottomTabNavigator, createStackNavigator } from 'react-navigation';
 import SettingsPage from './SettingsPage';
-import SwipeNavigation from './SwipeNavigation';
+import SwipeNavigationPage from './SwipeNavigationPage';
+import SwipeNavigationPageModel from './SwipeNavigationPageModel';
 
 const stackNavigator = createStackNavigator({
-  Swipe: { screen: SwipeNavigation },
+  Swipe: { screen: SwipeNavigationPage },
   Settings: { screen: SettingsPage }
 },
 {
@@ -39,6 +40,7 @@ export default class App extends Component {
     return (
       <Provider
         arrowPageModel={ArrowPageModel.getInstance()}
+        swipeNavigationPageModel={SwipeNavigationPageModel.getInstance()}
       >
         <AppContainer />
       </Provider>

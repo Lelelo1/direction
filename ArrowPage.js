@@ -14,6 +14,7 @@ import Icon from 'react-native-vector-icons/MaterialIcons';
 import InfoIcon from 'react-native-vector-icons/Feather';
 import AutoHeightImage from 'react-native-auto-height-image';
 import ArrowPageModel from './ArrowPageModel';
+import SwipeNavigationPageModel from './SwipeNavigationPageModel';
 import { GooglePlacesAutocomplete } from 'react-native-google-places-autocomplete';
 import { scale, moderateScale } from 'react-native-size-matters';
 import { inject, observer } from 'mobx-react';
@@ -28,8 +29,10 @@ class ArrowPage extends Component {
     */
     state = {
         canClear: false,
+        scrollEnabled: false
     }
     renderSwipeoutButtons(rowData) {
+        console.log('render');
         /*
         return [
             {
@@ -61,11 +64,16 @@ class ArrowPage extends Component {
     }
     render() {
         return (
-            <ScrollView
+            <View
+                style={{ flex: 1 }}
+            
+                /*
+                Srcollview not needed anymore
                 contentContainerStyle={{ flex: 1 }}
                 keyboardDismissMode={'none'} // 
                 keyboardShouldPersistTaps={'handled'} // neccesary to prevent listview items to have to be pressed twice
                 scrollEnabled={false}
+                */
             >
                 <GooglePlacesAutocomplete
                     ref={(g) => { this.googlePlacesAutocomplete = g; }}
@@ -138,6 +146,10 @@ class ArrowPage extends Component {
                     textInputProps={{ clearButtonMode: 'never' }}
                     renderSwipeoutButtons={(rowData) => this.renderSwipeoutButtons(rowData)}
                     buttonWidth={scale(55)}
+                    onSwipeoutScroll={(scrollEnabled) => {
+                        SwipeNavigationPageModel.getInstance().scrollEnabled = scrollEnabled;
+                    }}
+                    
                 />
 
                 <View style={{ height: 44, width: '100%' }} />
@@ -172,7 +184,7 @@ class ArrowPage extends Component {
                         <Text>Right</Text>
                     </View>
                 </View>
-            </ScrollView>
+            </View>
         );
     }
     

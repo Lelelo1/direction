@@ -5,8 +5,10 @@ import ArrowPage from './ArrowPage';
 import ExplorePage from './ExplorePage';
 import Icon from 'react-native-vector-icons/Feather';
 import { scale } from 'react-native-size-matters';
+import { decorate, observable } from 'mobx';
+import { observer, inject } from 'mobx-react';
 
-export default class SwipeNavigation extends Component {
+class SwipeNavigationPage extends Component {
 
     static navigationOptions = ({ navigation }) => {
         const { state } = navigation;
@@ -43,12 +45,15 @@ export default class SwipeNavigation extends Component {
             :
             null;
     }
+
     changeTitle(titleText) {
         const { setParams } = this.props.navigation;
         setParams({ title: titleText, headerRight: this.settingsButton(titleText) });
     }
 
     render() {
+        console.log('render swipnavigation')
+
         return (
             <Swiper
                 loop={false}
@@ -63,6 +68,7 @@ export default class SwipeNavigation extends Component {
                 }}
                 keyboardDismissMode={'none'} // 
                 keyboardShouldPersistTaps={'handled'}
+                scrollEnabled={this.props.swipeNavigationPageModel.scrollEnabled}
             >
                 <ExplorePage />
                 <ArrowPage navigation={this.props.navigation} />
@@ -70,8 +76,5 @@ export default class SwipeNavigation extends Component {
         );
     }
 }
-/*
-decorate(SwipeNavigation, {
 
-})
-*/
+export default inject('swipeNavigationPageModel')(observer(SwipeNavigationPage));

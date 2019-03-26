@@ -126,7 +126,6 @@ export default class GooglePlacesAutocomplete extends Component {
     this._request = this.props.debounce
       ? debounce(this._request, this.props.debounce)
       : this._request;
-      this.keyboardDidHideListener = Keyboard.addListener('keyboardDidHide', this._keyboardDidHide);
   }
 
   componentDidMount() {
@@ -158,7 +157,6 @@ export default class GooglePlacesAutocomplete extends Component {
   componentWillUnmount() {
     this._abortRequests();
     this._isMounted = false;
-    this.keyboardDidHideListener.remove();
   }
 
   _abortRequests = () => {
@@ -598,10 +596,12 @@ export default class GooglePlacesAutocomplete extends Component {
         </TouchableHighlight>
       </ScrollView>
       */
+      
       <Swipeout
         right={this.props.renderSwipeoutButtons(rowData)}
-        buttonWidth={this.props.buttonWidth}
+        buttonWidth={this.props.swipeoutButtonWidth}
         scroll={this.props.onSwipeoutScroll}
+        
       >
         <TouchableHighlight
           style={{ width: WINDOW.width }}
@@ -643,8 +643,6 @@ export default class GooglePlacesAutocomplete extends Component {
   }
 
   _onFocus = () => this.setState({ listViewDisplayed: true })
-
-  _keyboardDidHide = () => { this.setState({ listViewDisplayed: false }); };
 
   _renderPoweredLogo = () => {
     if (!this._shouldShowPoweredLogo()) {
@@ -749,6 +747,9 @@ export default class GooglePlacesAutocomplete extends Component {
                   this.props.onClear();
                 }
               }}
+              onBlur={() => {
+                this._onBlur();
+              }}
             />
             {this._renderRightButton()}
           </View>
@@ -770,6 +771,7 @@ GooglePlacesAutocomplete.propTypes = {
   onFail: PropTypes.func,
   onClear: PropTypes.func,
   onLongPress: PropTypes.func,
+  onSwipeoutScroll: PropTypes.func,
   minLength: PropTypes.number,
   fetchDetails: PropTypes.bool,
   autoFocus: PropTypes.bool,
@@ -817,6 +819,7 @@ GooglePlacesAutocomplete.defaultProps = {
   onFail: () => {},
   onClear: () => {},
   onLongPress:() => {},
+  onSwipeoutScroll:() => {},
   minLength: 0,
   fetchDetails: false,
   autoFocus: false,
