@@ -1,18 +1,24 @@
 import React, { Component } from 'react';
 import { decorate, observable } from 'mobx';
-
+import { types } from 'mobx-state-tree';
 export default class SwipeNavigationPageModel {
     static instance = null;
 
     static getInstance() {
-        if (this.instance === null) {
-            this.instance = new SwipeNavigationPageModel();
+        if (SwipeNavigationPageModel.instance === null) {
+            SwipeNavigationPageModel.instance = new SwipeNavigationPageModel();
         }
-        return this.instance;
+        
+        return SwipeNavigationPageModel.instance;
     }
     scrollEnabled = true;
 
+    showPlaceButton = false;
+
+    title = 'Arrow';
 }
 decorate(SwipeNavigationPageModel, {
-    scrollEnabled: observable
+    scrollEnabled: observable,
+    showPlaceButton: observable,
+    title: observable
 });

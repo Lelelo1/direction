@@ -16,10 +16,13 @@ import { createAppContainer, createBottomTabNavigator, createStackNavigator } fr
 import SettingsPage from './SettingsPage';
 import SwipeNavigationPage from './SwipeNavigationPage';
 import SwipeNavigationPageModel from './SwipeNavigationPageModel';
+import PlacePageModel from './PlacePageModel';
+import PlacePage from './PlacePage';
 
 const stackNavigator = createStackNavigator({
   Swipe: { screen: SwipeNavigationPage },
-  Settings: { screen: SettingsPage }
+  Settings: { screen: SettingsPage },
+  Place: { screen: PlacePage }
 },
 {
   initialRouteKey: 'Swipe'
@@ -41,6 +44,7 @@ export default class App extends Component {
       <Provider
         arrowPageModel={ArrowPageModel.getInstance()}
         swipeNavigationPageModel={SwipeNavigationPageModel.getInstance()}
+        placePageModel={PlacePageModel.getInstance()}
       >
         <AppContainer />
       </Provider>

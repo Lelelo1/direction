@@ -11,7 +11,7 @@ import {
 // import Swipeout from 'react-native-swipeout';
 import Qs from 'qs';
 import Icon from 'react-native-vector-icons/MaterialIcons';
-import InfoIcon from 'react-native-vector-icons/Feather';
+import PlaceIcon from 'react-native-vector-icons/Foundation';
 import AutoHeightImage from 'react-native-auto-height-image';
 import ArrowPageModel from './ArrowPageModel';
 import SwipeNavigationPageModel from './SwipeNavigationPageModel';
@@ -20,6 +20,7 @@ import { scale, moderateScale } from 'react-native-size-matters';
 import { inject, observer } from 'mobx-react';
 import { toJS } from 'mobx';
 import Utils from './Utils';
+import PlacePageModel from './PlacePageModel';
 
 class ArrowPage extends Component {
     /*
@@ -27,9 +28,21 @@ class ArrowPage extends Component {
         title: 'Arrow'
     }
     */
+
     state = {
         canClear: false,
-        scrollEnabled: false
+    }
+    componentDidMount() {
+        this.listener = this.props.navigation.addListener('didFocus', () => {
+            if (!this.props.arrowPageModel.naigated !== 'SettingsPage') { // if placepage user should return to listview again if it was opened
+                console.log('didFocus');
+                this.googlePlacesAutocomplete.listViewDisplayed = true;
+                this.googlePlacesAutocomplete.triggerFocus();
+            }
+        });
+    }
+    componentWillUnmount() {
+        this.listener.remove();
     }
     renderSwipeoutButtons(rowData) {
         console.log('render');
@@ -55,7 +68,7 @@ class ArrowPage extends Component {
             {
                 component: (
                     <View style={{ flex: 1, justifyContent: 'center', alignSelf: 'center' }}>
-                        <Icon name={'info'} size={33} />
+                        <PlaceIcon name={'info'} size={33} />
                     </View>
                 )
                 
@@ -138,6 +151,8 @@ class ArrowPage extends Component {
                     }}
                     onLongPress={(data, details) => {
                         console.log('long hold: ' + JSON.stringify(data), JSON.stringify(details));
+                        PlacePageModel.getInstance().place = { data, details };
+                        SwipeNavigationPageModel.getInstance().showPlaceButton = true;
                     }}
                     onClear={() => {
                         ArrowPageModel.getInstance().setDestination(null);
@@ -147,7 +162,7 @@ class ArrowPage extends Component {
                     renderSwipeoutButtons={(rowData) => this.renderSwipeoutButtons(rowData)}
                     buttonWidth={scale(55)}
                     onSwipeoutScroll={(scrollEnabled) => {
-                        SwipeNavigationPageModel.getInstance().scrollEnabled = scrollEnabled;
+                        SwipeNavigationPageModel.getInstance().scrollEnabled = scrollEnabled; //using setState with value didn't work
                     }}
                     
                 />

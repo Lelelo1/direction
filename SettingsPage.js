@@ -24,13 +24,14 @@ export default class SettingsPage extends Component {
         showDescriptionDialog: false
     }
     componentDidMount() {
+        ArrowPageModel.getInstance().navigated = 'SettingsPage';
         this.setState({ initialValue: ArrowPageModel.getInstance().radius / this.MAX_VALUE });
     }
     setDistance(val) {
         const v = val * this.MAX_VALUE;
         const m = Math.round(v);
         ArrowPageModel.getInstance().radius = m;
-        if (m >= this.MAX_VALUE) {
+        if (m >= this.MAX_VALUE - 500) { // 500 so that button is available earlier
             this.setState({ distance: this.meterConverter(m), enableButton: true });
             this.moreButton.pulse(2000);
         } else {

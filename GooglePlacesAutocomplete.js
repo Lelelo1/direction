@@ -231,7 +231,9 @@ export default class GooglePlacesAutocomplete extends Component {
       this._abortRequests();
 
       // display loader
-      this._enableRowLoader(rowData);
+      if (eventType === 'onPress') {
+        this._enableRowLoader(rowData);
+      }
 
       // fetch details
       const request = new XMLHttpRequest();
@@ -250,17 +252,23 @@ export default class GooglePlacesAutocomplete extends Component {
               this._disableRowLoaders();
               // this._onBlur(); 
               if(eventType === 'onPress') {
-                this._onBlur();  // hides the listView  
+                this._onBlur();  // hides the listView and only set textinput when normal press
+                this.setState({
+                  text: this._renderDescription( rowData ),
+                });
+  
+                  delete rowData.isLoading;
               } else if (eventType === 'onLongPress') {
                 this.triggerBlur();
               } 
               
-              
+              /*
               this.setState({
                 text: this._renderDescription( rowData ),
               });
 
                 delete rowData.isLoading;
+                */
               // this.pr  ops.onPress(rowData, details);
               fireEvent(rowData, details);
             }
