@@ -1,6 +1,5 @@
 import React, { Component } from 'react';
 import { decorate, observable } from 'mobx';
-import { types } from 'mobx-state-tree';
 export default class SwipeNavigationPageModel {
     static instance = null;
 
@@ -13,12 +12,12 @@ export default class SwipeNavigationPageModel {
     }
     scrollEnabled = true;
 
-    showPlaceButton = false;
+    showPlaceInfoButton = false;
 
     title = 'Arrow';
 }
 decorate(SwipeNavigationPageModel, {
     scrollEnabled: observable,
-    showPlaceButton: observable,
+    showPlaceInfoButton: observable,
     title: observable
 });

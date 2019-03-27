@@ -8,11 +8,16 @@ import { scale } from 'react-native-size-matters';
 import { decorate, observable, toJS, autorun, computed, reaction } from 'mobx';
 import { observer, inject } from 'mobx-react';
 import { onSnapshot } from  'mobx-state-tree';
-import PlaceIcon from 'react-native-vector-icons/Foundation';
+import PlaceInfoIcon from 'react-native-vector-icons/SimpleLineIcons';
+import PlaceIcon from 'react-native-vector-icons/MaterialIcons';
 import SwipeNavigationPageModel from './SwipeNavigationPageModel';
+import * as Animatable from 'react-native-animatable';
+import ArrowPageModel from './ArrowPageModel';
 
 class SwipeNavigationPage extends Component {
-
+    static values = {
+        iconSize: 25
+    }
     static navigationOptions = ({ navigation }) => {
         const { state } = navigation;
         const title = state.params ? `${state.params.title}` : 'Arrow';
@@ -22,27 +27,19 @@ class SwipeNavigationPage extends Component {
         };
     };
     static headerRight(title, navigation) {
+        const { iconSize } = SwipeNavigationPage.values;
         return title === 'Arrow' ? (
             <View
                 style={{
                     alignItems: 'center',
                     justifyContent: 'space-evenly',
-                    alignContent: 'center',
-                    width: scale(80), 
+                    width: scale(100),
+                    height: '100%', 
                     flexDirection: 'row', 
-                    paddingRight: scale(14)
+                    paddingRight: scale(6),
                     }}
             >
-                <TouchableOpacity
-                    onPress={() => {
-                        navigation.navigate('Place');
-                    }}
-                >
-                    <PlaceIcon
-                        name={'info'}
-                        size={33}
-                    />
-                </TouchableOpacity>
+                {this.renderPlaceInfoButton(navigation, iconSize)}
                 <TouchableOpacity
                     onPress={() => {
                         navigation.navigate('Settings');
@@ -50,7 +47,8 @@ class SwipeNavigationPage extends Component {
                 >
                     <Icon
                         name={'settings'}
-                        size={25}
+                        size={iconSize}
+                        style={{ width: iconSize, height: iconSize }}
                     />
                 </TouchableOpacity>
             </View>
@@ -58,7 +56,63 @@ class SwipeNavigationPage extends Component {
             :
             null;
     }
-
+    static renderPlaceButton(navigation, iconSize) {
+        const shouldRender = ArrowPageModel.getInstance().isShowingDirection;
+        return shouldRender ? (
+            <TouchableOpacity
+                    onPress={() => {
+                        navigation.navigate('Place');
+                    }}
+                >
+                    <PlaceIcon
+                        name={'place'}
+                        size={iconSize}
+                        style={{ width: iconSize, height: iconSize }}
+                    />
+                </TouchableOpacity>
+        ) : (
+            <View style={{ width: iconSize, height: iconSize }} /> // render empty on the area so that settings button don't replaces itself
+        );
+    }
+    static renderPlaceInfoButton(navigation, iconSize) {
+        const shouldRender = SwipeNavigationPageModel.getInstance().showPlaceInfoButton;
+        return shouldRender ? (
+            <Animatable.View ref={(ref) => SwipeNavigationPage.animateAndDisappear(ref)} >
+                <TouchableOpacity
+                    onPress={() => {
+                        navigation.navigate('Place');
+                    }}
+                >
+                    <PlaceInfoIcon
+                        name={'info'}
+                        size={iconSize}
+                        style={{ width: iconSize, height: iconSize }}
+                    />
+                </TouchableOpacity>
+            </Animatable.View>
+        )
+        :
+        SwipeNavigationPage.renderPlaceButton(navigation, iconSize);
+    }
+    static avoidCancel = [];
+    static animateAndDisappear(ref) {
+        if (ref) {
+            const avoidCancel = SwipeNavigationPage.avoidCancel;
+            avoidCancel.push(ref);
+            ref.flash(2000).then((fulfilled) => {
+                console.log('fulfilled: ' + JSON.stringify(fulfilled));
+            });
+            ref.bounceIn(3000).then(() => {
+                setTimeout(() => {
+                    const index = avoidCancel.indexOf(ref);
+                    avoidCancel.splice(index, 1);
+                    if (avoidCancel.length === 0) { // cancel with time only when it has not already been cancelled by long hold on new item
+                        SwipeNavigationPageModel.getInstance().showPlaceInfoButton = false;
+                    }
+                }, 1500);
+            });
+        }
+    }
     componentDidMount() {
         /*
         // console.log(toJS(this.props.swipeNavigationPageModel));
@@ -93,11 +147,21 @@ class SwipeNavigationPage extends Component {
         reaction(() => this.props.swipeNavigationPageModel.title, (title, reaction) => {
             console.log(title);
             this.updateTitle(title);
-        }, this.reaction);
+        }, this.reactionOnTitleChange);
+        reaction(() => this.props.swipeNavigationPageModel.showPlaceInfoButton, (show, reaction) => {
+            this.updateTitle(this.props.swipeNavigationPageModel.title);
+        }, this.reactionOnShowPlaceButton);
+        reaction(() => this.props.arrowPageModel.isShowingDirection, (show, reaction) => {
+            console.log('isShowingDirection');
+            this.updateTitle(this.props.swipeNavigationPageModel.title);
+        }, this.reactOnIsShowingDirection); // address set
     }
     componentWillUnmount() {
         // this.onTitleChanged(); // disposed
-        this.reaction();
+        console.log('unmount');
+        this.reactionOnTitleChange();
+        this.reactionOnShowPlaceButton();
+        this.reactOnIsShowingDirection();
     }
     updateTitle(title) {
         const { setParams } = this.props.navigation;
@@ -148,4 +212,4 @@ class SwipeNavigationPage extends Component {
     }
 }
 
-export default inject('swipeNavigationPageModel')(observer(SwipeNavigationPage));
+export default inject('swipeNavigationPageModel', 'arrowPageModel')(observer(SwipeNavigationPage));

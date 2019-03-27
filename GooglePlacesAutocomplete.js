@@ -18,6 +18,7 @@ import {
 import Swipeout from 'react-native-swipeout';
 import Qs from 'qs';
 import debounce from 'lodash.debounce';
+import { jsxClosingElement } from '@babel/types';
 
 const WINDOW = Dimensions.get('window');
 
@@ -137,7 +138,6 @@ export default class GooglePlacesAutocomplete extends Component {
 
   componentWillReceiveProps(nextProps) {
     let listViewDisplayed = true;
-
     if (nextProps.listViewDisplayed !== 'auto') {
       listViewDisplayed = nextProps.listViewDisplayed;
     }
@@ -256,7 +256,6 @@ export default class GooglePlacesAutocomplete extends Component {
                 this.setState({
                   text: this._renderDescription( rowData ),
                 });
-  
                   delete rowData.isLoading;
               } else if (eventType === 'onLongPress') {
                 this.triggerBlur();
@@ -644,10 +643,11 @@ export default class GooglePlacesAutocomplete extends Component {
 
   _onBlur = () => {
     this.triggerBlur();
-
+    
     this.setState({
       listViewDisplayed: false
     });
+    
   }
 
   _onFocus = () => this.setState({ listViewDisplayed: true })

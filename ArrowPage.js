@@ -141,18 +141,19 @@ class ArrowPage extends Component {
                     }}
                     predefinedPlaces={this.props.arrowPageModel.predefinedPlaces}
                     predefinedPlacesAlwaysVisible={true}
-                    listViewDisplayed={false}
+                    listViewDisplayed={'auto'}
                     fetchDetails={true}
                     onPress={(data, details) => {
                         console.log(JSON.stringify(data), JSON.stringify(details));
-                        // ArrowPageModel.getInstance().setDestination(details.geometry.location);
+                        ArrowPageModel.getInstance().setDestination(details.geometry.location);
                         this.setState({ canClear: true });
 
                     }}
                     onLongPress={(data, details) => {
                         console.log('long hold: ' + JSON.stringify(data), JSON.stringify(details));
+                        SwipeNavigationPageModel.getInstance().showPlaceInfoButton = false; // cancel previous animation when long pressing fast on different items
                         PlacePageModel.getInstance().place = { data, details };
-                        SwipeNavigationPageModel.getInstance().showPlaceButton = true;
+                        SwipeNavigationPageModel.getInstance().showPlaceInfoButton = true;
                     }}
                     onClear={() => {
                         ArrowPageModel.getInstance().setDestination(null);

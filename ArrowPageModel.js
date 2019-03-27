@@ -11,17 +11,24 @@ export default class ArrowPageModel {
         }
         return this.instance;
     }
+    
+    isShowingDirection = false;
+
     // const degree_update_rate = 3; // Number of degrees changed before the callback is triggered
     setDestination(location) {
         if (location) {
+            this.isShowingDirection = true;
             const degreeUpdateRate = 3;
+            /*
             RNSimpleCompass.start(degreeUpdateRate, (degree) => {
                 // console.log('degree:' + degree);
                 this.setRotate(270 - degree);
             });
+            */
         } else {
             console.log('stopped');
-            RNSimpleCompass.stop();
+            // RNSimpleCompass.stop();
+            this.isShowingDirection = false;
         }
     }
     rotate = '270deg'
@@ -40,6 +47,7 @@ export default class ArrowPageModel {
     predefinedPlaces = [];
 }
 decorate(ArrowPageModel, {
+    isShowingDirection: observable, // is used by swipeNavigationPage reaction
     rotate: observable,
     radius: observable,
     predefinedPlaces: observable
