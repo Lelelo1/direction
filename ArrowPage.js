@@ -29,9 +29,6 @@ class ArrowPage extends Component {
     }
     */
 
-    state = {
-        canClear: false,
-    }
     componentDidMount() {
         this.listener = this.props.navigation.addListener('didFocus', () => {
             if (!this.props.arrowPageModel.naigated !== 'SettingsPage') { // if placepage user should return to listview again if it was opened
@@ -76,6 +73,7 @@ class ArrowPage extends Component {
         ];
     }
     render() {
+        // canClear might cause rerender so that googleplacestranslate is set to auto thus showing listview
         return (
             <View
                 style={{ flex: 1 }}
@@ -141,12 +139,11 @@ class ArrowPage extends Component {
                     }}
                     predefinedPlaces={this.props.arrowPageModel.predefinedPlaces}
                     predefinedPlacesAlwaysVisible={true}
-                    listViewDisplayed={'auto'}
+                    listViewDisplayed={false}
                     fetchDetails={true}
                     onPress={(data, details) => {
                         console.log(JSON.stringify(data), JSON.stringify(details));
                         ArrowPageModel.getInstance().setDestination(details.geometry.location);
-                        this.setState({ canClear: true });
 
                     }}
                     onLongPress={(data, details) => {
@@ -157,7 +154,6 @@ class ArrowPage extends Component {
                     }}
                     onClear={() => {
                         ArrowPageModel.getInstance().setDestination(null);
-                        this.setState({ canClear: false });
                     }}
                     textInputProps={{ clearButtonMode: 'never' }}
                     renderSwipeoutButtons={(rowData) => this.renderSwipeoutButtons(rowData)}
@@ -172,13 +168,13 @@ class ArrowPage extends Component {
 
                 <View style={{ alignItems: 'flex-end', paddingTop: moderateScale(11), paddingRight: moderateScale(11) }}>
                     <TouchableOpacity
-                        disabled={!this.state.canClear}
+                        disabled={!this.props.arrowPageModel.isShowingDirection}
                         onPress={() => {
                             this.googlePlacesAutocomplete.setAddressText('');
-                            this.setState({ canClear: false });
+                            ArrowPageModel.getInstance().setDestination('');
                         }}
                     >
-                        <Icon name={'clear'} size={scale(33)} color={this.state.canClear ? 'black' : 'transparent'} />
+                        <Icon name={'clear'} size={scale(33)} color={this.props.arrowPageModel.isShowingDirection ? 'black' : 'transparent'} />
                     </TouchableOpacity>
                 </View>
                 <View style={{ flex: 1, width: '93%', alignItems: 'center', alignSelf: 'center', justifyContent: 'center' }}>

@@ -137,6 +137,7 @@ export default class GooglePlacesAutocomplete extends Component {
   }
 
   componentWillReceiveProps(nextProps) {
+    /*
     let listViewDisplayed = true;
     if (nextProps.listViewDisplayed !== 'auto') {
       listViewDisplayed = nextProps.listViewDisplayed;
@@ -152,6 +153,7 @@ export default class GooglePlacesAutocomplete extends Component {
         listViewDisplayed: listViewDisplayed
       });
     }
+    */
   }
 
   componentWillUnmount() {
