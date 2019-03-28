@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { View, TouchableOpacity } from 'react-native';
+import { View, TouchableOpacity, Text} from 'react-native';
 import Swiper from 'react-native-swiper';
 import ArrowPage from './ArrowPage';
 import ExplorePage from './ExplorePage';
@@ -23,7 +23,7 @@ class SwipeNavigationPage extends Component {
         const title = state.params ? `${state.params.title}` : 'Arrow';
         return {
             title,
-            headerRight: SwipeNavigationPage.headerRight(title, navigation)
+            headerRight: SwipeNavigationPage.headerRight(title, navigation),
         };
     };
     static headerRight(title, navigation) {
@@ -113,84 +113,11 @@ class SwipeNavigationPage extends Component {
             });
         }
     }
-    componentDidMount() {
-        /*
-        // console.log(toJS(this.props.swipeNavigationPageModel));
-        console.log(SwipeNavigationPageModel.getInstance());
-        onSnapshot(SwipeNavigationPageModel.getInstance(), (snapshot) => {
-            console.log('snapshot: ' + snapshot);
-            
-        });
-        */
-       /*
-        this.onTitleChanged = autorun((reaction) => {
-            const title = this.props.swipeNavigationPageModel.title;
-            console.log(title);
-            this.updateTitle(title);
-        });
-        */
-       /*
-        computed((options) => {
-            console.log('options: ' + options);
-            const title = this.props.swipeNavigationPageModel.title;
-            console.log(title);
-        });
-        */
-       /*
-       observer((ob) => {
-        console.log('ob ' + ob);
-            const title = this.props.swipeNavigationPageModel.title;
-            console.log(title);
-       });
-       */
-
-        reaction(() => this.props.swipeNavigationPageModel.title, (title, reaction) => {
-            console.log(title);
-            this.updateTitle(title);
-        }, this.reactionOnTitleChange);
-        reaction(() => this.props.swipeNavigationPageModel.showPlaceInfoButton, (show, reaction) => {
-            this.updateTitle(this.props.swipeNavigationPageModel.title);
-        }, this.reactionOnShowPlaceButton);
-        reaction(() => this.props.arrowPageModel.isShowingDirection, (show, reaction) => {
-            console.log('isShowingDirection');
-            this.updateTitle(this.props.swipeNavigationPageModel.title);
-        }, this.reactOnIsShowingDirection); // address set
-    }
-    componentWillUnmount() {
-        // this.onTitleChanged(); // disposed
-        console.log('unmount');
-        this.reactionOnTitleChange();
-        this.reactionOnShowPlaceButton();
-        this.reactOnIsShowingDirection();
-    }
-    updateTitle(title) {
-        const { setParams } = this.props.navigation;
-        setParams({ title });
-    }
-/*
-<TouchableOpacity
-                style={{ paddingRight: scale(14) }}
-                onPress={() => {
-                    this.props.navigation.navigate('Settings');
-                }}
-            >
-                <Icon
-                    name={'settings'}
-                    size={22}
-                />
-            </TouchableOpacity>
-*/
-/*
-    changeTitle(titleText) {
-        const { setParams } = this.props.navigation;
-        setParams({ title: titleText });
-    }
-    */
     render() {
         return (
             <Swiper
                 loop={false}
-                showsPagination={false}
+                // showsPagination={false}
                 index={1}
                 onIndexChanged={(index) => {
                     if (index === 0) {
@@ -205,11 +132,18 @@ class SwipeNavigationPage extends Component {
                 keyboardShouldPersistTaps={'handled'}
                 scrollEnabled={this.props.swipeNavigationPageModel.scrollEnabled}
             >
-                <ExplorePage />
-                <ArrowPage navigation={this.props.navigation} />
+                <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }} >
+                    <Text>left</Text>
+                </View>
+                <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }} >
+                    <Text>right</Text>
+                </View>
             </Swiper>
+
+            
         );
     }
 }
-
+// <ExplorePage />
+// <ArrowPage navigation={this.props.navigation} />
 export default inject('swipeNavigationPageModel', 'arrowPageModel')(observer(SwipeNavigationPage));

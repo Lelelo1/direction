@@ -14,10 +14,13 @@ export default class SwipeNavigationPageModel {
 
     showPlaceInfoButton = false;
 
-    title = 'Arrow';
+    title = 'Arrow'; // remove 
+
+    index = 1;
 }
 decorate(SwipeNavigationPageModel, {
     scrollEnabled: observable,
     showPlaceInfoButton: observable,
-    title: observable
+    title: observable,
+    index: observable
 });

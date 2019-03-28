@@ -11,35 +11,147 @@ import {
 // import Swipeout from 'react-native-swipeout';
 import Qs from 'qs';
 import Icon from 'react-native-vector-icons/MaterialIcons';
-import PlaceIcon from 'react-native-vector-icons/Foundation';
+import PlaceInfoIcon from 'react-native-vector-icons/SimpleLineIcons';
 import AutoHeightImage from 'react-native-auto-height-image';
 import ArrowPageModel from './ArrowPageModel';
 import SwipeNavigationPageModel from './SwipeNavigationPageModel';
 import { GooglePlacesAutocomplete } from 'react-native-google-places-autocomplete';
 import { scale, moderateScale } from 'react-native-size-matters';
 import { inject, observer } from 'mobx-react';
-import { toJS } from 'mobx';
+import { toJS, reaction } from 'mobx';
 import Utils from './Utils';
 import PlacePageModel from './PlacePageModel';
+import Pagination from './Pagination';
+import * as Animatable from 'react-native-animatable';
 
 class ArrowPage extends Component {
-    /*
-    static navigationOptions = {
-        title: 'Arrow'
+    static values = {
+        iconSize: 25
     }
-    */
+    static navigationOptions = ({ navigation }) => {
+        const { state } = navigation;
+        // const title = state.params ? `${state.params.title}` : 'Arrow';
+        return {
+            title: 'Arrow',
+            headerRight: ArrowPage.headerRight(navigation),
+        };
+    };
+    static headerRight(navigation) {
+        const { iconSize } = ArrowPage.values;
+        return (
+            <View
+                style={{
+                    alignItems: 'center',
+                    justifyContent: 'space-evenly',
+                    width: scale(100),
+                    height: '100%',
+                    flexDirection: 'row',
+                    paddingRight: scale(6),
+                }}
+            >
+                {this.renderPlaceInfoButton(navigation, iconSize)}
+                <TouchableOpacity
+                    onPress={() => {
+                        navigation.navigate('Settings');
+                    }}
+                >
+                    <Icon
+                        name={'settings'}
+                        size={iconSize}
+                        style={{ width: iconSize, height: iconSize }}
+                    />
+                </TouchableOpacity>
+            </View>
+        );
+    }
+    static renderPlaceButton(navigation, iconSize) {
+        const shouldRender = ArrowPageModel.getInstance().isShowingDirection;
+        return shouldRender ? (
+            <TouchableOpacity
+                onPress={() => {
+                    navigation.navigate('Place');
+                }}
+            >
+                <Icon
+                    name={'place'}
+                    size={iconSize}
+                    style={{ width: iconSize, height: iconSize }}
+                />
+            </TouchableOpacity>
+        ) : (
+                <View style={{ width: iconSize, height: iconSize }} /> // render empty on the area so that settings button don't replaces itself
+            );
+    }
+    static renderPlaceInfoButton(navigation, iconSize) {
+        const shouldRender = SwipeNavigationPageModel.getInstance().showPlaceInfoButton;
+        return shouldRender ? (
+            <Animatable.View ref={(ref) => ArrowPage.animateAndDisappear(ref)} >
+                <TouchableOpacity
+                    onPress={() => {
+                        navigation.navigate('Place');
+                    }}
+                >
+                    <PlaceInfoIcon
+                        name={'info'}
+                        size={iconSize}
+                        style={{ width: iconSize, height: iconSize }}
+                    />
+                </TouchableOpacity>
+            </Animatable.View>
+        )
+            :
+            ArrowPage.renderPlaceButton(navigation, iconSize);
+    }
+    static avoidCancel = [];
+    static animateAndDisappear(ref) {
+        if (ref) {
+            const avoidCancel = ArrowPage.avoidCancel;
+            avoidCancel.push(ref);
+            ref.flash(2000).then((fulfilled) => {
+                console.log('fulfilled: ' + JSON.stringify(fulfilled));
+            });
+            ref.bounceIn(3000).then(() => {
+                setTimeout(() => {
+                    const index = avoidCancel.indexOf(ref);
+                    avoidCancel.splice(index, 1);
+                    if (avoidCancel.length === 0) { // cancel with time only when it has not already been cancelled by long hold on new item
+                        SwipeNavigationPageModel.getInstance().showPlaceInfoButton = false;
+                    }
+                }, 1500);
+            });
+        }
+    }
+
 
     componentDidMount() {
-        this.listener = this.props.navigation.addListener('didFocus', () => {
+        this.willFocusListener = this.props.navigation.addListener('willFocus', () => {
+            SwipeNavigationPageModel.getInstance().index = 1;
+        });
+        this.didFocusListener = this.props.navigation.addListener('didFocus', () => {
             if (!this.props.arrowPageModel.naigated !== 'SettingsPage') { // if placepage user should return to listview again if it was opened
-                console.log('didFocus');
                 this.googlePlacesAutocomplete.listViewDisplayed = true;
                 this.googlePlacesAutocomplete.triggerFocus();
             }
         });
+
+        this.reactionOnShowPlaceButton = reaction(() => this.props.swipeNavigationPageModel.showPlaceInfoButton, (show, reaction) => {
+            this.updateHeaderRight();
+        }, {});
+        this.reactionOnIsShowingDirection = reaction(() => this.props.arrowPageModel.isShowingDirection, (show, reaction) => {
+            console.log('isShowingDirection');
+            this.updateHeaderRight();
+        }, {});
     }
     componentWillUnmount() {
-        this.listener.remove();
+        this.willFocusListener.remove();
+        this.didFocusListener.remove();
+        this.reactionOnShowPlaceButton();
+        this.reactionOnIsShowingDirection();
+    }
+    updateHeaderRight() {
+        const { setParams } = this.props.navigation;
+        // setParams({ title });
+        setParams({});
     }
     renderSwipeoutButtons(rowData) {
         console.log('render');
@@ -65,26 +177,24 @@ class ArrowPage extends Component {
             {
                 component: (
                     <View style={{ flex: 1, justifyContent: 'center', alignSelf: 'center' }}>
-                        <PlaceIcon name={'info'} size={33} />
+                        <Icon name={'info'} size={33} />
                     </View>
                 )
                 
             }
         ];
     }
+
     render() {
         // canClear might cause rerender so that googleplacestranslate is set to auto thus showing listview
         return (
-            <View
-                style={{ flex: 1 }}
-            
-                /*
-                Srcollview not needed anymore
+            <ScrollView
+                //style={{ flex: 1 }} // had to change back to scroll view after removing react-native-swiper so that deselecting textinput works
                 contentContainerStyle={{ flex: 1 }}
                 keyboardDismissMode={'none'} // 
                 keyboardShouldPersistTaps={'handled'} // neccesary to prevent listview items to have to be pressed twice
                 scrollEnabled={false}
-                */
+                
             >
                 <GooglePlacesAutocomplete
                     ref={(g) => { this.googlePlacesAutocomplete = g; }}
@@ -196,13 +306,15 @@ class ArrowPage extends Component {
                         <Text>Right</Text>
                     </View>
                 </View>
-            </View>
+                        {/*total is amount of tabs in App.js*/} 
+                <Pagination total={2} index={this.props.swipeNavigationPageModel.index} />
+            </ScrollView>
         );
     }
     
 }
 
-export default inject('arrowPageModel')(observer(ArrowPage));
+export default inject('arrowPageModel', 'swipeNavigationPageModel')(observer(ArrowPage));
 
 /**
  * in googleplacesautcomplete
