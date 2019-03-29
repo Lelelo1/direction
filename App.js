@@ -6,44 +6,15 @@
  * @flow
  */
 
-import React, {Component} from 'react';
-import {Platform, StyleSheet, Text, View} from 'react-native';
-import ExplorePage from './ExplorePage';
-import ArrowPage from './ArrowPage';
+import React, { Component } from 'react';
 import ArrowPageModel from './ArrowPageModel';
 import { Provider } from 'mobx-react';
-import { createAppContainer, createMaterialTopTabNavigator, createStackNavigator } from 'react-navigation';
-import SettingsPage from './SettingsPage';
-import SwipeNavigationPage from './SwipeNavigationPage';
 import SwipeNavigationPageModel from './SwipeNavigationPageModel';
 import PlacePageModel from './PlacePageModel';
-import PlacePage from './PlacePage';
-
-const stackNavigator = createStackNavigator({
-  Swipe: { screen: ArrowPage },
-  Settings: { screen: SettingsPage },
-  Place: { screen: PlacePage }
-},
-{
-  initialRouteKey: 'Swipe',
-  defaultNavigationOptions: { headerVisible: false },
-  navigationOptions: { headerVisible: false }
-});
-// can't swipe between tabs on ios
-const tabs = createMaterialTopTabNavigator({
-  Explore: { screen: ExplorePage },
-  Arrow: { screen: stackNavigator }
-},
-{
-  initialRouteName: 'Arrow',
-  swipeEnabled: true,
-  tabBarPosition: 'bottom',
-  defaultNavigationOptions: { tabBarVisible: false }
-});
-
-const AppContainer = createAppContainer(tabs);
+import AppNavigation from './AppNavigation';
 
 export default class App extends Component {
+  
   render() {
     return (
       <Provider
@@ -51,9 +22,10 @@ export default class App extends Component {
         swipeNavigationPageModel={SwipeNavigationPageModel.getInstance()}
         placePageModel={PlacePageModel.getInstance()}
       >
-        <AppContainer />
+        <AppNavigation />
       </Provider>
     );
   }
 }
+
 

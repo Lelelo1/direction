@@ -24,7 +24,9 @@ import PlacePageModel from './PlacePageModel';
 import Pagination from './Pagination';
 import * as Animatable from 'react-native-animatable';
 
+let self;
 class ArrowPage extends Component {
+    
     static values = {
         iconSize: 25
     }
@@ -36,6 +38,7 @@ class ArrowPage extends Component {
             headerRight: ArrowPage.headerRight(navigation),
         };
     };
+
     static headerRight(navigation) {
         const { iconSize } = ArrowPage.values;
         return (
@@ -88,7 +91,7 @@ class ArrowPage extends Component {
             <Animatable.View ref={(ref) => ArrowPage.animateAndDisappear(ref)} >
                 <TouchableOpacity
                     onPress={() => {
-                        navigation.navigate('Place');
+                        self.navigateInfoPlace();
                     }}
                 >
                     <PlaceInfoIcon
@@ -121,19 +124,22 @@ class ArrowPage extends Component {
             });
         }
     }
-
-
+    constructor() {
+        super();
+        self = this;
+    }
     componentDidMount() {
-        this.willFocusListener = this.props.navigation.addListener('willFocus', () => {
-            SwipeNavigationPageModel.getInstance().index = 1;
+        this.didBlurListener = this.props.navigation.addListener('didBlur', () => {
+            SwipeNavigationPageModel.getInstance().tabBarSwipeEnabled = false;
+            console.log('set');
         });
-        this.didFocusListener = this.props.navigation.addListener('didFocus', () => {
-            if (!this.props.arrowPageModel.naigated !== 'SettingsPage') { // if placepage user should return to listview again if it was opened
+        this.willFocusListener = this.props.navigation.addListener('willFocus', () => {
+            if (this.props.arrowPageModel.showListViewOnReturn) { // if placepage user should return to listview again if it was opened
                 this.googlePlacesAutocomplete.listViewDisplayed = true;
                 this.googlePlacesAutocomplete.triggerFocus();
             }
+            SwipeNavigationPageModel.getInstance().index = 1;
         });
-
         this.reactionOnShowPlaceButton = reaction(() => this.props.swipeNavigationPageModel.showPlaceInfoButton, (show, reaction) => {
             this.updateHeaderRight();
         }, {});
@@ -143,6 +149,7 @@ class ArrowPage extends Component {
         }, {});
     }
     componentWillUnmount() {
+        this.didBlurListener.remove();
         this.willFocusListener.remove();
         this.didFocusListener.remove();
         this.reactionOnShowPlaceButton();
@@ -152,6 +159,14 @@ class ArrowPage extends Component {
         const { setParams } = this.props.navigation;
         // setParams({ title });
         setParams({});
+    }
+    navigateInfoPlace() { // show listview on return if it was open
+        if (this.googlePlacesAutocomplete.listViewDisplayed) {
+            ArrowPageModel.getInstance().showListViewOnReturn = true;
+        } else {
+            ArrowPageModel.getInstance().showListViewOnReturn = false;
+        }
+        this.props.navigation.navigate('Place');
     }
     renderSwipeoutButtons(rowData) {
         console.log('render');
@@ -177,7 +192,13 @@ class ArrowPage extends Component {
             {
                 component: (
                     <View style={{ flex: 1, justifyContent: 'center', alignSelf: 'center' }}>
-                        <Icon name={'info'} size={33} />
+                        <TouchableOpacity
+                            onPress={() => {
+                                this.navigateInfoPlace();
+                            }}
+                        >
+                            <PlaceInfoIcon name={'info'} size={28} />
+                        </TouchableOpacity>
                     </View>
                 )
                 

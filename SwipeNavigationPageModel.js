@@ -17,10 +17,13 @@ export default class SwipeNavigationPageModel {
     title = 'Arrow'; // remove 
 
     index = 1;
+
+    tabBarSwipeEnabled = true;
 }
 decorate(SwipeNavigationPageModel, {
     scrollEnabled: observable,
     showPlaceInfoButton: observable,
     title: observable,
-    index: observable
+    index: observable,
+    tabBarSwipeEnabled: observable
 });

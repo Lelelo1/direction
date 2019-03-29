@@ -12,8 +12,10 @@ import Geolocation from 'react-native-geolocation-service';
 
 export default class SettingsPage extends Component {
 
-    static navigationOptions = {
-        title: 'Settings'
+    static navigationOptions = ({ navigation }) => {
+        return {
+            title: 'Settings'
+        };
     }
 
     state = {

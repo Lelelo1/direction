@@ -12,7 +12,7 @@ export default class ArrowPageModel {
         return this.instance;
     }
     
-    isShowingDirection = false;
+    isShowingDirection = false; // used by 
 
     // const degree_update_rate = 3; // Number of degrees changed before the callback is triggered
     setDestination(location) {
@@ -45,6 +45,8 @@ export default class ArrowPageModel {
     }
 
     predefinedPlaces = [];
+
+    showListViewOnReturn = false;
 }
 decorate(ArrowPageModel, {
     isShowingDirection: observable, // is used by swipeNavigationPage reaction
