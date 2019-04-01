@@ -1,3 +1,4 @@
+import { decorate, observable } from "mobx";
 
 export default class PlacePageModel {
 
@@ -12,3 +13,6 @@ export default class PlacePageModel {
 
     place;
 }
+decorate(PlacePageModel, {
+    place: observable
+});

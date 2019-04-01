@@ -39,32 +39,14 @@ const tabs = createMaterialTopTabNavigator({
 }
 );
 
-tabs.navigationOptions = ({ navigation }) => {
+/*
+tabs.navigationOptions = ({ navigation }) => { // can not access tabs navigationOptions from here
     console.log('tabs');
 };
-
+*/ 
 const AppContainer = createAppContainer(tabs);
 export default class AppNavigation extends Component {
 
-    componentDidMount() {
-        console.log('mount');
-        /*
-        this.willFocusListener = this.props.navigation.addListener('willFocus', () => {
-            SwipeNavigationPageModel.getInstance().index = 0;
-        });
-        this.reactionOnTabBarSwipeEnableChange = reaction(() => this.props.swipeNavigationPageModel.tabBarSwipeEnabled, (enable, reaction) => {
-            console.log('enable: ' + enable);
-            this.props.navigation.setParams({ swipeEnabled: enable });
-            this.appNavigation.props.
-        }, {});
-        */
-    }
-    componentWillUnmount() {
-        /*
-        this.willFocusListener.remove();
-        this.reactionOnTabBarSwipeEnableChange();
-        */
-    }
     render() {
         return (
             <AppContainer />

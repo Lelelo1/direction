@@ -9,7 +9,7 @@ import {
     ScrollView
 } from 'react-native';
 // import Swipeout from 'react-native-swipeout';
-import Qs from 'qs';
+import Qs from 'qs'; // use encode false when creating query arguments
 import Icon from 'react-native-vector-icons/MaterialIcons';
 import PlaceInfoIcon from 'react-native-vector-icons/SimpleLineIcons';
 import AutoHeightImage from 'react-native-auto-height-image';
@@ -52,6 +52,7 @@ class ArrowPage extends Component {
                     paddingRight: scale(6),
                 }}
             >
+                
                 {this.renderPlaceInfoButton(navigation, iconSize)}
                 <TouchableOpacity
                     onPress={() => {
@@ -111,7 +112,7 @@ class ArrowPage extends Component {
             const avoidCancel = ArrowPage.avoidCancel;
             avoidCancel.push(ref);
             ref.flash(2000).then((fulfilled) => {
-                console.log('fulfilled: ' + JSON.stringify(fulfilled));
+
             });
             ref.bounceIn(3000).then(() => {
                 setTimeout(() => {
@@ -130,8 +131,8 @@ class ArrowPage extends Component {
     }
     componentDidMount() {
         this.didBlurListener = this.props.navigation.addListener('didBlur', () => {
-            SwipeNavigationPageModel.getInstance().tabBarSwipeEnabled = false;
-            console.log('set');
+            // SwipeNavigationPageModel.getInstance().tabBarSwipeEnabled = false; did not work
+            this.googlePlacesAutocomplete._onBlur();
         });
         this.willFocusListener = this.props.navigation.addListener('willFocus', () => {
             if (this.props.arrowPageModel.showListViewOnReturn) { // if placepage user should return to listview again if it was opened
@@ -144,7 +145,6 @@ class ArrowPage extends Component {
             this.updateHeaderRight();
         }, {});
         this.reactionOnIsShowingDirection = reaction(() => this.props.arrowPageModel.isShowingDirection, (show, reaction) => {
-            console.log('isShowingDirection');
             this.updateHeaderRight();
         }, {});
     }
@@ -161,7 +161,7 @@ class ArrowPage extends Component {
         setParams({});
     }
     navigateInfoPlace() { // show listview on return if it was open
-        if (this.googlePlacesAutocomplete.listViewDisplayed) {
+        if (this.googlePlacesAutocomplete.state.listViewDisplayed) {
             ArrowPageModel.getInstance().showListViewOnReturn = true;
         } else {
             ArrowPageModel.getInstance().showListViewOnReturn = false;
@@ -194,10 +194,11 @@ class ArrowPage extends Component {
                     <View style={{ flex: 1, justifyContent: 'center', alignSelf: 'center' }}>
                         <TouchableOpacity
                             onPress={() => {
+                                console.log(JSON.stringify(this.googlePlacesAutocomplete.listViewDisplayed));
                                 this.navigateInfoPlace();
                             }}
                         >
-                            <PlaceInfoIcon name={'info'} size={28} />
+                            <PlaceInfoIcon name={'info'} size={26} />
                         </TouchableOpacity>
                     </View>
                 )
@@ -207,21 +208,21 @@ class ArrowPage extends Component {
     }
 
     render() {
-        // canClear might cause rerender so that googleplacestranslate is set to auto thus showing listview
         return (
             <ScrollView
                 //style={{ flex: 1 }} // had to change back to scroll view after removing react-native-swiper so that deselecting textinput works
                 contentContainerStyle={{ flex: 1 }}
-                keyboardDismissMode={'none'} // 
+                
+                keyboardDismissMode={'none'} 
                 keyboardShouldPersistTaps={'handled'} // neccesary to prevent listview items to have to be pressed twice
+                
                 scrollEnabled={false}
                 
             >
                 <GooglePlacesAutocomplete
-                    ref={(g) => { this.googlePlacesAutocomplete = g; }}
+                    ref={(ref) => { this.googlePlacesAutocomplete = ref; }}
                     placeholder='search'
-                    renderDescription={row => row.description}
-                    nearbyPlacesAPI='GooglePlacesSearch'
+                    // renderDescription={row => row.description}
                     query={{
                         key: Utils.getInstance().key,
                         radius: this.props.arrowPageModel.getRadius(),
@@ -231,20 +232,23 @@ class ArrowPage extends Component {
                     }}
                     /* can't use this
                     https://github.com/FaridSafi/react-native-google-places-autocomplete/issues/373
-                    GooglePlacesSearchQuery={{
-                        type: 'cafe',
-                        locationbias: this.props.arrowPageModel.radius
-                    }}
                     */
+                    GooglePlacesSearchQuery={{
+                        location: '57.708870,11.974560', // Burggrevegatan, 41103 Göteborg (Stampen) Stampen, Göteborg Göteborg Sverige
+                        radius: this.props.arrowPageModel.getRadius()
+                        // types: 'cafe'
+                    }}
+                    
                     styles={{
                         // to place suggestions on top
                         container: {
-                            flex: 0,
+                            height: '100%',
                             position: 'absolute',
                             width: '100%',
-                            zIndex: 1,
+                            // zIndex: 1,
                         },
                         listView: {
+                            flex: 1,
                             backgroundColor: 'white'
                         },
                         // just for styling
@@ -273,6 +277,7 @@ class ArrowPage extends Component {
                     listViewDisplayed={false}
                     fetchDetails={true}
                     onPress={(data, details) => {
+                        console.log('press');
                         console.log(JSON.stringify(data), JSON.stringify(details));
                         ArrowPageModel.getInstance().setDestination(details.geometry.location);
 
@@ -292,7 +297,7 @@ class ArrowPage extends Component {
                     onSwipeoutScroll={(scrollEnabled) => {
                         SwipeNavigationPageModel.getInstance().scrollEnabled = scrollEnabled; //using setState with value didn't work
                     }}
-                    
+                    api={'GooglePlacesSearch'}
                 />
 
                 <View style={{ height: 44, width: '100%' }} />
