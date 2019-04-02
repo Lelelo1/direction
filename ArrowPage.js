@@ -23,6 +23,7 @@ import Utils from './Utils';
 import PlacePageModel from './PlacePageModel';
 import Pagination from './Pagination';
 import * as Animatable from 'react-native-animatable';
+import Geolocation from 'react-native-geolocation-service';
 
 let self;
 class ArrowPage extends Component {
@@ -132,10 +133,12 @@ class ArrowPage extends Component {
     componentDidMount() {
         this.didBlurListener = this.props.navigation.addListener('didBlur', () => {
             // SwipeNavigationPageModel.getInstance().tabBarSwipeEnabled = false; did not work
+            SwipeNavigationPageModel.getInstance().showListViewOnReturn = false;
             this.googlePlacesAutocomplete._onBlur();
         });
         this.willFocusListener = this.props.navigation.addListener('willFocus', () => {
-            if (this.props.arrowPageModel.showListViewOnReturn) { // if placepage user should return to listview again if it was opened
+            console.log('willFocus: ' + this.props.swipeNavigationPageModel.showListViewOnReturn);
+            if (this.props.swipeNavigationPageModel.showListViewOnReturn) { // if placepage user should return to listview again if it was opened
                 this.googlePlacesAutocomplete.listViewDisplayed = true;
                 this.googlePlacesAutocomplete.triggerFocus();
             }
@@ -147,6 +150,14 @@ class ArrowPage extends Component {
         this.reactionOnIsShowingDirection = reaction(() => this.props.arrowPageModel.isShowingDirection, (show, reaction) => {
             this.updateHeaderRight();
         }, {});
+
+        /* need to fix swipe out issue: https://github.com/mobxjs/mobx-react/issues/510
+        this.reactionOnScrollEnabled = reaction(() => this.props.swipeNavigationPageModel.scrollEnabled, (scrollEnabled, reaction) => {
+            console.log('reaction');
+            const { setParams } = this.props.navigation;
+            setParams({ swipeEnabled: scrollEnabled });
+        }, {});
+        */
     }
     componentWillUnmount() {
         this.didBlurListener.remove();
@@ -154,6 +165,8 @@ class ArrowPage extends Component {
         this.didFocusListener.remove();
         this.reactionOnShowPlaceButton();
         this.reactionOnIsShowingDirection();
+
+        // this.reactionOnScrollEnabled();
     }
     updateHeaderRight() {
         const { setParams } = this.props.navigation;
@@ -161,12 +174,8 @@ class ArrowPage extends Component {
         setParams({});
     }
     navigateInfoPlace() { // show listview on return if it was open
-        if (this.googlePlacesAutocomplete.state.listViewDisplayed) {
-            ArrowPageModel.getInstance().showListViewOnReturn = true;
-        } else {
-            ArrowPageModel.getInstance().showListViewOnReturn = false;
-        }
-        this.props.navigation.navigate('Place');
+        const showListViewOnReturn = this.googlePlacesAutocomplete.state.listViewDisplayed;
+        this.props.navigation.navigate('Place', { infoPlace: true, showListViewOnReturn });
     }
     renderSwipeoutButtons(rowData) {
         console.log('render');
@@ -222,11 +231,24 @@ class ArrowPage extends Component {
                 <GooglePlacesAutocomplete
                     ref={(ref) => { this.googlePlacesAutocomplete = ref; }}
                     placeholder='search'
-                    // renderDescription={row => row.description}
+                    textInputProps={{ onFocus: () => {
+                        Geolocation.getCurrentPosition((position) => {
+                            console.log('position: ' + JSON.stringify(position));
+                            const pageModel = this.props.arrowPageModel;
+                            pageModel.location.latitude = position.coords.latitude;
+                            pageModel.location.longitude = position.coords.longitude;
+                        }, (error) => {
+                            console.log(error);
+                            console.warn(error);
+                        });
+                    },
+                        clearButtonMode: 'never',
+                        spellCheck: false }}
+
                     query={{
                         key: Utils.getInstance().key,
                         radius: this.props.arrowPageModel.getRadius(),
-                        location: '57.708870,11.974560',
+                        location: this.props.arrowPageModel.getLocationAsString(),
                         strictbounds: this.props.arrowPageModel.getRadius() ? 'strictbounds' : undefined,
                         sessiontoken: 'aqse34fr5hnj78l9g4s2svfbm377912kde'
                     }}
@@ -242,10 +264,10 @@ class ArrowPage extends Component {
                     styles={{
                         // to place suggestions on top
                         container: {
-                            height: '100%',
+                            flex: 1,
                             position: 'absolute',
                             width: '100%',
-                            // zIndex: 1,
+                            zIndex: 1,
                         },
                         listView: {
                             flex: 1,
@@ -291,17 +313,19 @@ class ArrowPage extends Component {
                     onClear={() => {
                         ArrowPageModel.getInstance().setDestination(null);
                     }}
-                    textInputProps={{ clearButtonMode: 'never' }}
                     renderSwipeoutButtons={(rowData) => this.renderSwipeoutButtons(rowData)}
                     buttonWidth={scale(55)}
                     onSwipeoutScroll={(scrollEnabled) => {
+                        console.log('scrollEnabled: ' + scrollEnabled);
                         SwipeNavigationPageModel.getInstance().scrollEnabled = scrollEnabled; //using setState with value didn't work
+                        /*
+                        const { setParams } = this.props.navigation; / won't work same issue as setState
+                        setParams({ scrollEnabled });
+                        */
                     }}
-                    api={'GooglePlacesSearch'}
+                    // api={'GooglePlacesSearch'} can't use GooglePlacesSearch beacuse shows too many results: https://stackoverflow.com/questions/55440295/flatlist-with-position-absolute-dont-scroll 
                 />
-
                 <View style={{ height: 44, width: '100%' }} />
-
                 <View style={{ alignItems: 'flex-end', paddingTop: moderateScale(11), paddingRight: moderateScale(11) }}>
                     <TouchableOpacity
                         disabled={!this.props.arrowPageModel.isShowingDirection}
@@ -324,7 +348,7 @@ class ArrowPage extends Component {
                             }}
                         />
                     </View>
-                    <Text style={{ fontSize: moderateScale(20) }}>amount of meters</Text>
+                    <Text style={{ fontSize: moderateScale(20) }}>{this.props.arrowPageModel.distance} meters</Text>
                 </View>
                 <View style={{ width: '93%', alignSelf: 'center' }}>
                     <View style={{ flexDirection: 'row', justifyContent: 'space-between' }}>
