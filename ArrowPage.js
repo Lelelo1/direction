@@ -223,8 +223,7 @@ class ArrowPage extends Component {
                 contentContainerStyle={{ flex: 1 }}
                 
                 keyboardDismissMode={'none'} 
-                keyboardShouldPersistTaps={'handled'} // neccesary to prevent listview items to have to be pressed twice
-                
+                keyboardShouldPersistTaps={'always'} // neccesary to prevent listview items to have to be pressed twice
                 scrollEnabled={false}
                 
             >
@@ -243,7 +242,9 @@ class ArrowPage extends Component {
                         });
                     },
                         clearButtonMode: 'never',
-                        spellCheck: false }}
+                        spellCheck: false,
+                        autoCorrect: false
+                    }}
 
                     query={{
                         key: Utils.getInstance().key,
@@ -302,12 +303,13 @@ class ArrowPage extends Component {
                         console.log('press');
                         console.log(JSON.stringify(data), JSON.stringify(details));
                         ArrowPageModel.getInstance().setDestination(details.geometry.location);
+                        PlacePageModel.getInstance().setPlace({ data, details });
 
                     }}
                     onLongPress={(data, details) => {
                         console.log('long hold: ' + JSON.stringify(data), JSON.stringify(details));
                         SwipeNavigationPageModel.getInstance().showPlaceInfoButton = false; // cancel previous animation when long pressing fast on different items
-                        PlacePageModel.getInstance().place = { data, details };
+                        PlacePageModel.getInstance().setPlace({ data, details });
                         SwipeNavigationPageModel.getInstance().showPlaceInfoButton = true;
                     }}
                     onClear={() => {
@@ -317,7 +319,7 @@ class ArrowPage extends Component {
                     buttonWidth={scale(55)}
                     onSwipeoutScroll={(scrollEnabled) => {
                         console.log('scrollEnabled: ' + scrollEnabled);
-                        SwipeNavigationPageModel.getInstance().scrollEnabled = scrollEnabled; //using setState with value didn't work
+                        // SwipeNavigationPageModel.getInstance().scrollEnabled = scrollEnabled; //using setState with value didn't work
                         /*
                         const { setParams } = this.props.navigation; / won't work same issue as setState
                         setParams({ scrollEnabled });

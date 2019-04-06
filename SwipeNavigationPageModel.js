@@ -1,5 +1,6 @@
 import React, { Component } from 'react';
 import { decorate, observable } from 'mobx';
+
 export default class SwipeNavigationPageModel {
     static instance = null;
 

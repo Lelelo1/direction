@@ -9,7 +9,7 @@ export default class Calculate {
         return radians * 180 / Math.PI;
     }
 
-
+    // https://stackoverflow.com/questions/46590154/calculate-bearing-between-2-points-with-javascript
     static bearing(startLat, startLng, destLat, destLng) {
         startLat = this.toRadians(startLat);
         startLng = this.toRadians(startLng);
@@ -23,6 +23,7 @@ export default class Calculate {
         brng = this.toDegrees(brng);
         return (brng + 360) % 360;
     }
+    // from xamarin
     static distance(lat1, lng1, lat2, lng2) {
         const earthRadius = 6371000;
         const dLat = this.toRadians(lat2 - lat1);

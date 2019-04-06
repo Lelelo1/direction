@@ -36,3 +36,4 @@ export default class App extends Component {
 
 // release build ios
 // https://stackoverflow.com/questions/42110496/how-to-build-ipa-application-for-react-native-ios
+// react-native run-ios --configuration=release --device "Leos iPhone"

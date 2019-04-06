@@ -33,10 +33,9 @@ export default class ArrowPageModel {
                     Geolocation.getCurrentPosition((position) => {
                         this.setRotate(270 - degree + Calculate.bearing(position.coords.latitude, position.coords.longitude,
                             this.destination.latitude, this.destination.longitude));
-                        console.log('calculate: ' + position.coords.latitude + ', ' + position.coords.longitude);
                        this.distance = Math.round(Calculate.distance(position.coords.latitude, position.coords.longitude,
                            this.destination.latitude, this.destination.longitude));
-                    }, (error) => { console.warn(error); }, { maximumAge: 1000 });  
+                    }, (error) => { console.warn(error); }, { maximumAge: 1000, enableHightAccuracy: true });  
                 } catch (exception) {
                     console.warn(exception);
                 }
