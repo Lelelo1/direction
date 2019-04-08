@@ -23,7 +23,9 @@ class PlacePage extends Component {
             title: 'Place'
         };
     }
-
+    state = {
+        showClockIcon: false
+    }
     componentDidMount() {
         // console.log(JSON.stringify(this.props.placePageModel.place));
         this.didFocus = this.props.navigation.addListener('didFocus', () => {
@@ -99,8 +101,7 @@ class PlacePage extends Component {
             <Animatable.View>
                 <TouchableOpacity
                     onPress={() => {
-                        PlacePageModel.getInstance().showClockIcon = !this.props.placePageModel.showClockIcon;
-                        // console.log('showClockIcon was set to: ' + PlacePageModel.getInstance().showClockIcon);
+                        this.setState({ showClockIcon: !this.state.showClockIcon });
                     }}
                 >
                     
@@ -115,7 +116,7 @@ class PlacePage extends Component {
                             openNow ? this.clockButtonStyle.open : this.clockButtonStyle.closed
                         ]}
                     >
-                        {this.props.placePageModel.showClockIcon ? <Clock name={'clockcircleo'} size={moderateScale(17)} /> : null }
+                        {this.state.showClockIcon ? <Clock name={'clockcircleo'} size={moderateScale(17)} /> : null }
                         <Text style={{ paddingLeft: moderateScale(3), fontSize: moderateScale(15) }}>{openNow ? 'open' : 'closed'}</Text>
                     </View>
                 </TouchableOpacity>
@@ -175,7 +176,7 @@ class PlacePage extends Component {
     renderTimeTable(openingHours) {
         // console.log('table: ' + JSON.stringify(openingHours.periods));
         if (openingHours.periods) {
-            return this.props.placePageModel.showClockIcon ? (
+            return this.state.showClockIcon ? (
                 <View style={{ margin: moderateScale(10) }}>
                     <Text>Opening hours</Text>
                     <Text>{this.periodsToString(openingHours.periods)}</Text>

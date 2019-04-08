@@ -131,6 +131,9 @@ class ArrowPage extends Component {
         self = this;
     }
     componentDidMount() {
+        this.willBlurListener = this.props.navigation.addListener('willBlur', () => {
+            console.log('will blur');
+        });
         this.didBlurListener = this.props.navigation.addListener('didBlur', () => {
             // SwipeNavigationPageModel.getInstance().tabBarSwipeEnabled = false; did not work
             SwipeNavigationPageModel.getInstance().showListViewOnReturn = false;
@@ -178,7 +181,7 @@ class ArrowPage extends Component {
         this.props.navigation.navigate('Place', { infoPlace: true, showListViewOnReturn });
     }
     renderSwipeoutButtons(rowData) {
-        console.log('render');
+        console.log('render swipeoutButtons'); // https://github.com/dancormier/react-native-swipeout/issues/327
         /*
         return [
             {
@@ -223,9 +226,8 @@ class ArrowPage extends Component {
                 contentContainerStyle={{ flex: 1 }}
                 
                 keyboardDismissMode={'none'} 
-                keyboardShouldPersistTaps={'always'} // neccesary to prevent listview items to have to be pressed twice
+                keyboardShouldPersistTaps={'handled'} // neccesary to prevent listview items to have to be pressed twice
                 scrollEnabled={false}
-                
             >
                 <GooglePlacesAutocomplete
                     ref={(ref) => { this.googlePlacesAutocomplete = ref; }}
@@ -243,9 +245,9 @@ class ArrowPage extends Component {
                     },
                         clearButtonMode: 'never',
                         spellCheck: false,
-                        autoCorrect: false
+                        autoCorrect: false,
+                        rejectResponderTermination: true
                     }}
-
                     query={{
                         key: Utils.getInstance().key,
                         radius: this.props.arrowPageModel.getRadius(),
@@ -317,16 +319,9 @@ class ArrowPage extends Component {
                     }}
                     renderSwipeoutButtons={(rowData) => this.renderSwipeoutButtons(rowData)}
                     buttonWidth={scale(55)}
-                    onSwipeoutScroll={(scrollEnabled) => {
-                        console.log('scrollEnabled: ' + scrollEnabled);
-                        // SwipeNavigationPageModel.getInstance().scrollEnabled = scrollEnabled; //using setState with value didn't work
-                        /*
-                        const { setParams } = this.props.navigation; / won't work same issue as setState
-                        setParams({ scrollEnabled });
-                        */
-                    }}
                     // api={'GooglePlacesSearch'} can't use GooglePlacesSearch beacuse shows too many results: https://stackoverflow.com/questions/55440295/flatlist-with-position-absolute-dont-scroll 
                 />
+        
                 <View style={{ height: 44, width: '100%' }} />
                 <View style={{ alignItems: 'flex-end', paddingTop: moderateScale(11), paddingRight: moderateScale(11) }}>
                     <TouchableOpacity
@@ -358,12 +353,14 @@ class ArrowPage extends Component {
                         <Text>Right</Text>
                     </View>
                 </View>
-                        {/*total is amount of tabs in App.js*/} 
-                <Pagination total={2} index={this.props.swipeNavigationPageModel.index} />
+                        
             </ScrollView>
         );
     }
-    
+  /*
+    total is amount of tabs in AppNavigation.js  .wont be using tabs to due swipe problem
+                <Pagination total={2} index={this.props.swipeNavigationPageModel.index} />
+  */
 }
 
 export default inject('arrowPageModel', 'swipeNavigationPageModel')(observer(ArrowPage));

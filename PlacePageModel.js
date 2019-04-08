@@ -27,8 +27,8 @@ export default class PlacePageModel {
     }
 
     // openingHours        should be local mobx state handling
-    showClockIcon = false;
+    // showClockIcon = false;
 }
 decorate(PlacePageModel, {
-    showClockIcon: observable
+    // showClockIcon: observable
 });

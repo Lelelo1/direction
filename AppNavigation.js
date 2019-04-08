@@ -29,47 +29,48 @@ inject(stores => {
     }  
   })(stackNavigator);
 */
-inject('swipeNavigationPageModel')(stackNavigator);
+// inject('swipeNavigationPageModel')(stackNavigator);
 
+/*
 stackNavigator.navigationOptions = ({ navigation, screenProps }) => {
     // console.log('screensProps: ' + JSON.stringify(screenProps));
+    console.log('tabNavigationOptions: ' + JSON.stringify(navigation.state));
+    let enabled = true;
+    
     if (navigation.state.index === 0) {
-       /*
-        let enabled = true;
-       if (navigation.state.swipeEnabled) {
-           enabled = navigation.state.swipeEnabled;
-       }
-       return {
-           swipeEnabled: enabled
-       }
-       */
-      return {
-          swipeEnabled: true
-      };
-   } else {
-       return {
-           swipeEnabled: false
-       };
-   }
+        
+        if (navigation.state.routes[0].params) {
+            console.log('sc: ' + navigation.state.routes[0].params.swipeEnabled);
+            enabled = navigation.state.routes[0].params.swipeEnabled;
+        }
+        
+    } else {
+        enabled = false; // prevent swipback to lead to wrong tab
+    }
+    
+    return {
+        swipeEnabled: enabled
+    };
 };
+*/
+/*
 const tabs = createMaterialTopTabNavigator({
   Explore: { screen: ExplorePage },
   Arrow: { screen: stackNavigator }
 },
 {
     initialRouteName: 'Arrow',
-    tabBarPosition: 'bottom',
     defaultNavigationOptions: { tabBarVisible: false },
     swipeEnabled: true
 }
 );
-
+*/
 /*
 tabs.navigationOptions = ({ navigation }) => { // can not access tabs navigationOptions from here
     console.log('tabs');
 };
 */ 
-const AppContainer = createAppContainer(tabs);
+const AppContainer = createAppContainer(stackNavigator);
 export default class AppNavigation extends Component {
     /*
     componentDidMount() {
