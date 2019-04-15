@@ -252,23 +252,15 @@ export default class GooglePlacesAutocomplete extends Component {
               const details = responseJSON.result;
               this._disableRowLoaders();
               // this._onBlur(); 
-              if(eventType === 'onPress') {
+              if (eventType === 'onPress') {
                 this._onBlur();  // hides the listView and only set textinput when normal press
                 this.setState({
-                  text: this._renderDescription( rowData ),
+                  text: this._renderDescription(rowData),
                 });
-                  delete rowData.isLoading;
-              } else if (eventType === 'onLongPress') {
-                this.triggerBlur();
-              } 
-              
-              /*
-              this.setState({
-                text: this._renderDescription( rowData ),
-              });
                 delete rowData.isLoading;
-                */
-              // this.pr  ops.onPress(rowData, details);
+              } else if (eventType === 'onLongPress') {
+
+              }
               fireEvent(rowData, details);
             }
           } else {
@@ -324,7 +316,7 @@ export default class GooglePlacesAutocomplete extends Component {
 
     } else {
       this.setState({
-        text: this._renderDescription( rowData ),
+        text: this._renderDescription(rowData),
       });
 
       this._onBlur();
@@ -502,12 +494,12 @@ export default class GooglePlacesAutocomplete extends Component {
             } else if (this.props.api === 'GoogleReverseGeocoding') {
               this._filterResultsByTypes(responseJSON.predictions, this.props.filterReverseGeocodingByTypes);
             } else if (this.props.api === 'GooglePlacesSearch') {
-              console.log('reponseJSON: ' + responseJSON);
+              // console.log('reponseJSON: ' + responseJSON);
               results = responseJSON.results;
             }
             if (results) {
               this._results = results;
-              console.log('results: ' + JSON.stringify(results));
+              // console.log('results: ' + JSON.stringify(results));
               this.setState({
                 dataSource: this.buildRowsFromResults(results),
               });
@@ -617,6 +609,7 @@ export default class GooglePlacesAutocomplete extends Component {
     return null;
   }
   _renderRow = (rowData = {}, sectionID, rowID) => {
+    let detailPromise = null;
     return (
       /*
       <ScrollView
@@ -638,12 +631,11 @@ export default class GooglePlacesAutocomplete extends Component {
         </TouchableHighlight>
       </ScrollView>
       */
-      
       <Swipeout
         right={this.props.renderSwipeoutButtons(rowData)}
         buttonWidth={this.props.swipeoutButtonWidth}
         scroll={this.props.onSwipeoutScroll}
-        
+        // onOpen={() => { detailPromise = this._onActivate(rowData, null, 'onOpen'); }} can't use beacuse of rerender issue, won't show swipoutbuttons
       >
         <TouchableHighlight
           style={{ width: WINDOW.width }}
@@ -651,7 +643,7 @@ export default class GooglePlacesAutocomplete extends Component {
             this._onActivate(rowData, this.props.onPress, 'onPress');
           }}
           onLongPress={() => {
-            this._onActivate(rowData, this.props.onLongPress, 'onLongHold');
+            this._onActivate(rowData, this.props.onLongPress, 'onLongPress');
           }}
           underlayColor={this.props.listUnderlayColor || "#c8c7cc"}
         >
@@ -764,8 +756,8 @@ export default class GooglePlacesAutocomplete extends Component {
       <View
         style={[this.props.suppressDefaultStyles ? {} : defaultStyles.container, this.props.styles.container]}
         pointerEvents="box-none"
-        onPress={() => {
-          console.log('pressed view');
+        onTouchStart={() => {
+          this.props.onTouchStart;
         }}
       >
         {!this.props.textInputHide &&

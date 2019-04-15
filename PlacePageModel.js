@@ -14,6 +14,7 @@ export default class PlacePageModel {
 
     place;
     setPlace(place) {
+        console.log('place was set: ' + JSON.stringify(place));
         if (place !== this.place) {
             // create url
             if (place.details.photos) {
@@ -30,5 +31,5 @@ export default class PlacePageModel {
     // showClockIcon = false;
 }
 decorate(PlacePageModel, {
-    // showClockIcon: observable
+    // place: observable
 });

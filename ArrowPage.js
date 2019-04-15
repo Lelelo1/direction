@@ -178,9 +178,9 @@ class ArrowPage extends Component {
     }
     navigateInfoPlace() { // show listview on return if it was open
         const showListViewOnReturn = this.googlePlacesAutocomplete.state.listViewDisplayed;
-        this.props.navigation.navigate('Place', { infoPlace: true, showListViewOnReturn });
+        this.props.navigation.navigate('Place', { pageType: 'infoPlace', showListViewOnReturn });
     }
-    renderSwipeoutButtons(rowData) {
+    renderSwipeoutButtons(data) {
         console.log('render swipeoutButtons'); // https://github.com/dancormier/react-native-swipeout/issues/327
         /*
         return [
@@ -206,8 +206,15 @@ class ArrowPage extends Component {
                     <View style={{ flex: 1, justifyContent: 'center', alignSelf: 'center' }}>
                         <TouchableOpacity
                             onPress={() => {
-                                console.log(JSON.stringify(this.googlePlacesAutocomplete.listViewDisplayed));
-                                this.navigateInfoPlace();
+                                fetch('https://maps.googleapis.com/maps/api/place/details/json?' + Qs.stringify({
+                                    key: Utils.getInstance().key,
+                                    placeid: data.place_id,
+                                    language: 'en'
+                                })).then(response => response.json()).then(details => {
+
+                                    PlacePageModel.getInstance().setPlace({ data, details: details.result });
+                                    this.navigateInfoPlace();
+                                });
                             }}
                         >
                             <PlaceInfoIcon name={'info'} size={26} />
@@ -311,7 +318,7 @@ class ArrowPage extends Component {
                     onLongPress={(data, details) => {
                         console.log('long hold: ' + JSON.stringify(data), JSON.stringify(details));
                         SwipeNavigationPageModel.getInstance().showPlaceInfoButton = false; // cancel previous animation when long pressing fast on different items
-                        PlacePageModel.getInstance().setPlace({ data, details });
+                        PlacePageModel.getInstance().setPlace({ data, details }); // need to set 
                         SwipeNavigationPageModel.getInstance().showPlaceInfoButton = true;
                     }}
                     onClear={() => {
