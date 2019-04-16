@@ -12,11 +12,15 @@ import Clock from 'react-native-vector-icons/AntDesign';
 import Home from 'react-native-vector-icons/MaterialCommunityIcons';
 import Phone from 'react-native-vector-icons/Entypo';
 import Google from 'react-native-vector-icons/FontAwesome5';
+import User from 'react-native-vector-icons/FontAwesome';
+import Right from 'react-native-vector-icons/AntDesign';
 import { verticalScale, moderateScale, scale } from 'react-native-size-matters';
 import Accordion from 'react-native-collapsible/Accordion'; // not using
 import Dialog, { DialogContent, DialogTitle } from 'react-native-popup-dialog';
 import { Header } from 'react-navigation';
-import { Card, Divider } from 'react-native-elements';
+// import { Card, Divider } from 'react-native-elements'; remove
+import StarRating from 'react-native-star-rating';
+// import { GiftedChat,Bubble } from "react-native-gifted-chat"; how to use?
 
 class PlacePage extends Component {
 
@@ -393,15 +397,101 @@ class PlacePage extends Component {
             </ImageBackground>
         );
     }
-    reviews(reviews) {
-        return reviews.map((review) => {
-            let r = null;
-            if (review.text) {
-                r = <Text key={review.time}>{review.text}</Text>;
+    getRateColor(number) {
+        const opacity = 0.4;
+        switch (number) {
+            case 1 : {
+                return `rgba(198, 13, 13, ${opacity})`;
             }
+            case 2 : {
+                return `rgba(234, 143, 39, ${opacity})`;
+            }
+            case 3 : {
+                return `rgba(226, 198, 34, ${opacity})`;
+            }
+            case 4: {
+                return `rgba(152, 221, 35, ${opacity})`;
+            }
+            case 5: {
+                return `rgba(74, 178, 14, ${opacity})`;
+            }
+            default : {
+                return 'grey';
+            }
+        }
+    }
+    reviews(reviews) {
+        console.log('reviewss:' + JSON.stringify(reviews));
+        return reviews.map((review) => {
+            let r = (
+                <View
+                key={review.time}
+                    style={{
+                        flex: 1,
+                        paddingHorizontal: scale(24),
+                        justifyContent: 'space-between',
+                        borderBottomWidth: moderateScale(2), // add same to top of parent view
+                        borderHorizontalWidth: moderateScale(2),
+                        borderColor: 'grey'
+                    }}
+                >
+                    <View style={{ flex: 1, flexDirection: 'row', justifyContent: 'space-between', alignContent: 'center', padding: moderateScale(8) }}>
+                        <View
+                            style={{
+                                backgroundColor: this.getRateColor(review.rating),
+                                justifyContent: 'center',
+                                alignItems: 'center',
+                                width: moderateScale((30 * 5)  + 10),
+                                borderRadius: 10,
+                                alignSelf: 'flex-end'
+                                    
+                            }}
+                            >
+                            <StarRating rating={review.rating} starSize={moderateScale(30)} />
+                        </View>
+                    </View>
+                    <View style={{ flex: 1, backgroundColor: '#e8e8e8', padding: moderateScale(10), borderRadius: 10, fontSize: moderateScale(16) }}>
+                        <Text>{review.text}</Text>
+                    </View>
+                    <View style={{ flexDirection: 'row', justifyContent: 'flex-end', padding: moderateScale(10), alignItems: 'center' }}>
+                        <TouchableOpacity style={{ flexDirection: 'row', backgroundColor: 'rgba(161, 198, 209, 0.6)', alignItems: 'center', borderRadius: 10 }}>
+                            <User style={{ margin: moderateScale(5) }} name={'user-circle'} size={moderateScale(20)} />
+                            <Text style={{ fontSize: moderateScale(20), margin: moderateScale(3) }}>{review.author_name}</Text>
+                            <Right style={{ margin: moderateScale(5) }} name={'right'} size={moderateScale(20)} />
+                        </TouchableOpacity>
+                    </View>
+                </View>
+            );
             return r;
         });
     }
+    /*
+    r = <Text key={review.time}>{review.text}</Text>;
+    */
+   /*
+    getMessages(reviews) {
+        return reviews.map(review => {
+            const utcSeconds = review.time;
+            const date = new Date(0); // The 0 there is the key, which sets the date to the epoch
+            date.setUTCSeconds(utcSeconds);
+
+            let name = 'Anonymous';
+            if (review.author_name) {
+                name = review.author_name;
+            }
+            const message = {
+                _id: review.time + Math.round(Math.random() * 1000000),
+                text: review.text,
+                createdAt: date,
+                user: {
+                    _id: review.time + Math.round(Math.random() * 1000000),
+                    name
+                },
+            };
+            return message;
+        });
+   }
+   */
     renderReviews() {
         const reviews = this.props.placePageModel.place.details.reviews; // already checked via scrollenabled reviewButton
         return this.state.scrollEnabled ? (
@@ -412,7 +502,13 @@ class PlacePage extends Component {
         :
         null;
     }
-
+/*
+    (
+            <View style={{ flex: 1 }}>
+                {this.reviews(reviews)}
+            </View>
+        )
+*/
     scrollUp() {
         console.log('scrollY: ' + this.scrollY);
         if (!this.scrollY) this.scrollY = 0;
