@@ -12,7 +12,7 @@ import Clock from 'react-native-vector-icons/AntDesign';
 import Home from 'react-native-vector-icons/MaterialCommunityIcons';
 import Phone from 'react-native-vector-icons/Entypo';
 import Google from 'react-native-vector-icons/FontAwesome5';
-import User from 'react-native-vector-icons/FontAwesome';
+import UserMoney from 'react-native-vector-icons/FontAwesome';
 import Right from 'react-native-vector-icons/AntDesign';
 import { verticalScale, moderateScale, scale } from 'react-native-size-matters';
 import Accordion from 'react-native-collapsible/Accordion'; // not using
@@ -47,55 +47,109 @@ class PlacePage extends Component {
             }         
         });
     }
+    getPriceLevel(number) {
+        switch (number) {
+            case 0 : {
+                return 'Free';
+            }
+            case 1 : {
+                return 'Inexpensive';
+            }
+            case 2 : {
+                return 'Moderate';
+            }
+            case 3 : {
+                return 'Expensive';
+            }
+            case 4 : {
+                return 'Very Expensive';
+            }
+            default : {
+                return 'Unspecified';
+            }
+        }
+    }
+    renderPriceLevel() {
+        const priceLevel = this.props.placePageModel.place.details.price_level;
+        return (
+            <View
+                style={{
+                    flexDirection: 'column',
+                    alignItems: 'center',
+                    backgroundColor: 'rgba(186, 152, 111, 0.7)',
+                    alignSelf: 'center',
+                    borderRadius: 20,
+                    padding: moderateScale(4),
+                }}
+            >
+                <View
+                    style={{
+                        flexDirection: 'row',
+                        // backgroundColor: 'rgba(140, 105, 64, 0.4)',
+                        borderRadius: 10,
+                        padding: moderateScale(4),
+                        paddingBottom: 0,
+                        alignItems: 'center'
+                    }}
+                >
+                    <UserMoney name={'money'} size={moderateScale(22)} />
+                    <Text style={{ paddingLeft: moderateScale(4) }}>Price level</Text>
+                </View>
+                <Text style={{ fontWeight: 'bold', fontSize: moderateScale(20), padding: moderateScale(2) }}>{this.getPriceLevel(priceLevel)}</Text>
 
+            </View>
+        );
+    }
     windowWidth = Dimensions.get('window').width;
     swiperWidth = scale(this.windowWidth - scale(30));
     renderSlides() {
         // console.log('renderingSlides');
         const photos = this.props.placePageModel.place.details.photos;
-        return photos.map(photo => {
-            // console.log('image: ' + JSON.stringify(photo));
-            const c = (
-                <View key={photo.photo_reference} style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
-                    <AutoHeightImage source={{ uri: photo.url }} width={this.swiperWidth - scale(80)} height={190} />
-                </View>
-            );
-            // c.key = photo.photo_reference;
-            return c;
-        });
-    }
-    renderSwiper() {
+        if (photos) {
+            if (photos.length > 0) {
+                return photos.map(photo => {
+                    // console.log('image: ' + JSON.stringify(photo));
+                    const c = (
+                        <View key={photo.photo_reference} style={{ flex: 1, alignItems: 'center' }}>
+                            <AutoHeightImage source={{ uri: photo.url }} width={this.swiperWidth - scale(80)} height={190} />
+                        </View>
+                    );
+                    // c.key = photo.photo_reference;
+                    return c;
+                });
+            } else {
+                // unexpected details reponse. photos was not array
+            }
+        }
+        // render empty area...
         return (
-            <View
-                style={{ height: 190, justifyContent: 'center', marginVertical: verticalScale(30) }}
-            >
-                <Swiper
-                    loop={false} // need set false otherwise last index shown on rerender https://maps.googleapis.com/maps/api/place/photo?maxwidth=946&photoreference=CmRaAAAAMB76EjM8gsuRpqQTy6uEaQn0Ua-n9QT5ibV-o5QSYGU0Ce2fokFa6U7CMy-qSY9CqDrdWFNBHyO8-FCbTg3IDBWP_sfj_TmTVVq5BJ-mp88h3eo63nFVpp8OtsZZxEt1EhC4eTACpDG03-We4LkgTlaLGhQbXFORsmFPCdX1tLljGBJVplffzw&key=AIzaSyBIHuu2CVqTKLmahKCE4wmHL3dStmIuViY
-                    showsButtons={true}
-                    showsPagination={false}
-                    autoplay={false}
-                    width={this.swiperWidth}
-                    // height={20} // can't set height https://github.com/leecade/react-native-swiper/issues/718
-                    removeClippedSubviews={false} // to prevent https://github.com/leecade/react-native-swiper/issues/416
-                >
-                    {this.renderSlides()}
-                </Swiper>
-            </View >
-
+            <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
+                {/*<AutoHeightImage source={{ uri: photo.url }} width={this.swiperWidth - scale(80)} height={190} />*/}
+            </View>
         );
     }
     renderSwiperArea() {
-        if (!this.props.placePageModel.place.details.photos) {
-            // console.log('no photos');
-        } else {
-            // console.log('has photos');
-        }
-        // console.log('images: ' + JSON.stringify(this.props.placePageModel.place.details.photos));
-        return this.props.placePageModel.place.details.photos ? (
-            this.renderSwiper()
-        )
-        :
-        null;
+        return (
+            <View style={{ flex: 1, justifyContent: 'space-evenly' }}>
+                <View
+                    style={{ height: 190, justifyContent: 'flex-start' }}
+                >
+                    <Swiper
+                        loop={false} // need set false otherwise last index shown on rerender https://maps.googleapis.com/maps/api/place/photo?maxwidth=946&photoreference=CmRaAAAAMB76EjM8gsuRpqQTy6uEaQn0Ua-n9QT5ibV-o5QSYGU0Ce2fokFa6U7CMy-qSY9CqDrdWFNBHyO8-FCbTg3IDBWP_sfj_TmTVVq5BJ-mp88h3eo63nFVpp8OtsZZxEt1EhC4eTACpDG03-We4LkgTlaLGhQbXFORsmFPCdX1tLljGBJVplffzw&key=AIzaSyBIHuu2CVqTKLmahKCE4wmHL3dStmIuViY
+                        showsButtons={true}
+                        showsPagination={false}
+                        autoplay={false}
+                        width={this.swiperWidth}
+                        // height={20} // can't set height https://github.com/leecade/react-native-swiper/issues/718
+                        removeClippedSubviews={false} // to prevent https://github.com/leecade/react-native-swiper/issues/416
+                    >
+                        {this.renderSlides()}
+                    </Swiper>
+                </View >
+                {this.renderPriceLevel()}
+            </View>
+
+        );
     }
     clockButtonStyle = {
         open: {
@@ -234,7 +288,7 @@ class PlacePage extends Component {
                     >
                         <DialogTitle title={<Text>Opening hours</Text>} />
                         <DialogContent>
-                            <View style={{ width: scale(250), height: verticalScale(140), justifyContent: 'center' }}>
+                            <View style={{ margin: moderateScale(20), justifyContent: 'center' }}>
                                 <Text style={{ alignSelf: 'center' }}>{this.periodsToString(openingHours.periods)}</Text>
                             </View>
                         </DialogContent>
@@ -298,7 +352,7 @@ class PlacePage extends Component {
                         width: moderateScale(100), 
                         height: moderateScale(50), 
                         borderRadius: 45,
-                        opacity: 0.6
+                        opacity: 0.7
                     }}
                     onPress={() => {
                         if ((this.scrollY > 0 && this.scrollY < 10) || !this.scrollY) {
@@ -358,12 +412,10 @@ class PlacePage extends Component {
                 <View
                     style={{
                         flex: 1,
-                        justifyContent: 'space-between',
+                        justifyContent: 'space-evenly',
                         alignItems: 'center',
                         // backgroundColor: '#725132',
-                        // paddingVertical: moderateScale(20),
-                        paddingTop: verticalScale(15),
-                        paddingBottom: verticalScale(55)
+                        // marginVertical: moderateScale(10)
 
                     }}
 
@@ -398,7 +450,7 @@ class PlacePage extends Component {
         );
     }
     getRateColor(number) {
-        const opacity = 0.4;
+        const opacity = 0.6;
         switch (number) {
             case 1 : {
                 return `rgba(198, 13, 13, ${opacity})`;
@@ -441,23 +493,23 @@ class PlacePage extends Component {
                                 backgroundColor: this.getRateColor(review.rating),
                                 justifyContent: 'center',
                                 alignItems: 'center',
-                                width: moderateScale((30 * 5)  + 10),
+                                margin: moderateScale(2),
                                 borderRadius: 10,
                                 alignSelf: 'flex-end'
                                     
                             }}
                             >
-                            <StarRating rating={review.rating} starSize={moderateScale(30)} />
+                            <StarRating rating={review.rating} starSize={moderateScale(25)} />
                         </View>
                     </View>
-                    <View style={{ flex: 1, backgroundColor: '#e8e8e8', padding: moderateScale(10), borderRadius: 10, fontSize: moderateScale(16) }}>
+                    <View style={{ flex: 1, backgroundColor: '#e8e8e8', padding: moderateScale(10), borderRadius: 10 }}>
                         <Text>{review.text}</Text>
                     </View>
                     <View style={{ flexDirection: 'row', justifyContent: 'flex-end', padding: moderateScale(10), alignItems: 'center' }}>
                         <TouchableOpacity style={{ flexDirection: 'row', backgroundColor: 'rgba(161, 198, 209, 0.6)', alignItems: 'center', borderRadius: 10 }}>
-                            <User style={{ margin: moderateScale(5) }} name={'user-circle'} size={moderateScale(20)} />
-                            <Text style={{ fontSize: moderateScale(20), margin: moderateScale(3) }}>{review.author_name}</Text>
-                            <Right style={{ margin: moderateScale(5) }} name={'right'} size={moderateScale(20)} />
+                            <UserMoney style={{ margin: moderateScale(5) }} name={'user-circle'} size={moderateScale(18)} />
+                            <Text style={{ margin: moderateScale(3) }}>{review.author_name}</Text>
+                            <Right style={{ margin: moderateScale(5) }} name={'right'} size={moderateScale(18)} />
                         </TouchableOpacity>
                     </View>
                 </View>
@@ -522,7 +574,7 @@ class PlacePage extends Component {
     }
     renderTitleArea() {
         return (
-            <View style={{ width: '100%', height: moderateScale(90) }}>
+            <View style={{ width: '100%', paddingTop: moderateScale(4), paddingBottom: moderateScale(20) }}>
                 <View style={{ width: '75%', alignSelf: 'center', alignItems: 'center' }}>
                     <Text style={{ fontSize: moderateScale(22), textAlign: 'center' }}>{this.props.placePageModel.place.details.name}</Text>
                 </View>
@@ -532,7 +584,7 @@ class PlacePage extends Component {
     }
     renderTopArea() {
         return (
-            <View style={{ width: '100%', height: moderateScale(130), justifyContent: 'space-around' }}>
+            <View style={{ width: '100%' }}>
                 {this.renderTitleArea()}
                 {this.renderOpeningHours()}
             </View>
@@ -553,7 +605,7 @@ class PlacePage extends Component {
                 
             >
                 <View style={{ height: (this.windowHeight - Header.HEIGHT) }}>
-                    <View style={{ height: '52%' }}>
+                    <View style={{ height: '60%' }}>
                         {this.renderTopArea()}
                         {this.renderSwiperArea()}
                     </View>
@@ -567,3 +619,7 @@ class PlacePage extends Component {
 }
 
 export default inject('placePageModel')(observer(PlacePage));
+
+/*
+    height: (this.windowHeight - Header.HEIGHT) not exact on iphone 10
+*/
