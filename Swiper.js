@@ -79,7 +79,7 @@ export default class Swiper extends Component {
                 itemWidth={style.swiperWidth}
                 hasParallaxImages={this.props.useParallax}
                 onSnapToItem={(index) => { this.setState({ activeIndex: index }); }}
-                
+
             />
             </View>
         );
@@ -109,7 +109,11 @@ export default class Swiper extends Component {
     renderButton(direction) {
         if (direction === 'left') {
             return this.state.activeIndex > 0 ? (
-                <TouchableOpacity>
+                <TouchableOpacity
+                    onPress={() => {
+                        this.carousel._snapToItem(this.state.activeIndex - 1);
+                    }}
+                >
                     <Button name={'left'} size={moderateScale(35)} />
                 </TouchableOpacity>
             )
@@ -119,7 +123,7 @@ export default class Swiper extends Component {
             return this.state.activeIndex < this.props.data.length - 1 ? (
                 <TouchableOpacity
                     onPress={() => {
-                        
+                        this.carousel._snapToItem(this.state.activeIndex + 1);
                     }}
                 >
                     <Button name={'right'} size={moderateScale(35)} />

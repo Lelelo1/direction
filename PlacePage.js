@@ -386,8 +386,7 @@ class PlacePage extends Component {
                             
                             this.setState({ scrollEnabled: true }, () => {
                                 setTimeout(() => {
-                                    // this.scrollView.scrollToEnd({ animated: true });
-                                    this.scrollTo(this.)
+                                    this.scrollView.scrollToEnd({ animated: true });
                                 }, 100);
                             });
                             
