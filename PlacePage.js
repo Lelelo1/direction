@@ -3,10 +3,9 @@ import { View, Text, Switch, Dimensions, TouchableOpacity, ScrollView, Animated,
 import { inject, observer } from 'mobx-react';
 import PlacePageModel from './PlacePageModel';
 import SwipeNavigationPageModel from './SwipeNavigationPageModel';
-import Swiper from 'react-native-swiper';
+// import Swiper from 'react-native-swiper';
 import AutoHeightImage from 'react-native-auto-height-image';
 import * as Animatable from 'react-native-animatable';
-import { decorate } from 'mobx-state-tree';
 import { observable } from 'mobx';
 import Clock from 'react-native-vector-icons/AntDesign';
 import Home from 'react-native-vector-icons/MaterialCommunityIcons';
@@ -21,6 +20,8 @@ import { Header } from 'react-navigation';
 // import { Card, Divider } from 'react-native-elements'; remove
 import StarRating from 'react-native-star-rating';
 // import { GiftedChat,Bubble } from "react-native-gifted-chat"; how to use?
+import Carousel from 'react-native-snap-carousel';
+import Swiper from './Swiper';
 
 class PlacePage extends Component {
 
@@ -71,37 +72,39 @@ class PlacePage extends Component {
     }
     renderPriceLevel() {
         const priceLevel = this.props.placePageModel.place.details.price_level;
-        return (
+        return priceLevel ? (
             <View
                 style={{
                     flexDirection: 'column',
                     alignItems: 'center',
                     backgroundColor: 'rgba(186, 152, 111, 0.7)',
                     alignSelf: 'center',
-                    borderRadius: 20,
-                    padding: moderateScale(4),
+                    borderRadius: 10,
+                    padding: moderateScale(2),
                 }}
             >
                 <View
                     style={{
                         flexDirection: 'row',
                         // backgroundColor: 'rgba(140, 105, 64, 0.4)',
-                        borderRadius: 10,
-                        padding: moderateScale(4),
+                        padding: moderateScale(2),
                         paddingBottom: 0,
                         alignItems: 'center'
                     }}
                 >
-                    <UserMoney name={'money'} size={moderateScale(22)} />
-                    <Text style={{ paddingLeft: moderateScale(4) }}>Price level</Text>
+                    <UserMoney name={'money'} size={moderateScale(20)} />
+                    <Text style={{ paddingLeft: moderateScale(2) }}>Price level</Text>
                 </View>
-                <Text style={{ fontWeight: 'bold', fontSize: moderateScale(20), padding: moderateScale(2) }}>{this.getPriceLevel(priceLevel)}</Text>
-
+                <Text style={{ fontWeight: 'bold', fontSize: moderateScale(16), padding: moderateScale(2) }}>{this.getPriceLevel(priceLevel)}</Text>
             </View>
-        );
+
+        )
+        :
+        null;
     }
     windowWidth = Dimensions.get('window').width;
-    swiperWidth = scale(this.windowWidth - scale(30));
+    // swiperWidth = scale(this.windowWidth - scale(30));
+    // refractored
     renderSlides() {
         // console.log('renderingSlides');
         const photos = this.props.placePageModel.place.details.photos;
@@ -128,6 +131,7 @@ class PlacePage extends Component {
             </View>
         );
     }
+    /*
     renderSwiperArea() {
         return (
             <View style={{ flex: 1, justifyContent: 'space-evenly' }}>
@@ -151,6 +155,29 @@ class PlacePage extends Component {
 
         );
     }
+    */
+    swiperWidth = scale(this.windowWidth - scale(30));
+    carouselIndex = 0;
+    getSnapCarousel() {
+        let photos = this.props.placePageModel.place.details.photos;
+        photos = photos.map(photo => { photo.uri = photo.url; return photo; });
+        return photos ? ( // wrapped in view so that if no photos present it still take up the area
+            <Swiper data={photos} showButtons={true} />
+        )
+        :
+        (
+            <View style={{ flex: 1 }} />
+        );
+    }
+    renderSnapCarouselArea() {
+        return (
+            <View style={{ flex: 1, justifyContent: 'space-evenly' }}>
+                {this.getSnapCarousel()}
+                {this.renderPriceLevel()}
+            </View>
+        );
+    }
+
     clockButtonStyle = {
         open: {
             backgroundColor: 'green'
@@ -356,13 +383,35 @@ class PlacePage extends Component {
                     }}
                     onPress={() => {
                         if ((this.scrollY > 0 && this.scrollY < 10) || !this.scrollY) {
+                            
                             this.setState({ scrollEnabled: true }, () => {
                                 setTimeout(() => {
-                                    this.scrollView.scrollToEnd({ animated: true });
+                                    // this.scrollView.scrollToEnd({ animated: true });
+                                    this.scrollTo(this.)
                                 }, 100);
                             });
+                            
+                           /*
+                           // scroll bottom
+                            const animatedValue = new Animated.Value(this.scrollH);
+                            const id = animatedValue.addListener(({ value }) => {
+                                console.log('value: ' + value);
+                                this.scrollTo(value); // scroll to bottom
+                            });
+                            this.scrollView.addListenerOn() = (w, h) => {
+                                console.log('setValue: ' + h);
+                                animatedValue.setValue(h);
+                                // animatedValue.removeListener(id);
+                            };
+                            this.setState({ scrollEnabled: true });
+                            */
                         } else {
-                            this.scrollUp();
+                            /*
+                            this.scrollView.scrollTo({ x: 0, y: 0, animated: true });
+                            this.setState({ scrollEnabled: false });
+                            can't need callback
+                            */
+                            this.scrollTo(0);
                         }
                     }}
                 >
@@ -488,19 +537,7 @@ class PlacePage extends Component {
                     }}
                 >
                     <View style={{ flex: 1, flexDirection: 'row', justifyContent: 'space-between', alignContent: 'center', padding: moderateScale(8) }}>
-                        <View
-                            style={{
-                                backgroundColor: this.getRateColor(review.rating),
-                                justifyContent: 'center',
-                                alignItems: 'center',
-                                margin: moderateScale(2),
-                                borderRadius: 10,
-                                alignSelf: 'flex-end'
-                                    
-                            }}
-                            >
-                            <StarRating rating={review.rating} starSize={moderateScale(25)} />
-                        </View>
+                        <StarRating rating={review.rating} starSize={moderateScale(25)} fullStarColor={this.getRateColor(review.rating)}/>
                     </View>
                     <View style={{ flex: 1, backgroundColor: '#e8e8e8', padding: moderateScale(10), borderRadius: 10 }}>
                         <Text>{review.text}</Text>
@@ -561,17 +598,21 @@ class PlacePage extends Component {
             </View>
         )
 */
-    scrollUp() {
-        console.log('scrollY: ' + this.scrollY);
+    scrollTo(y) {
         if (!this.scrollY) this.scrollY = 0;
-
+        console.log('from scrollY: ' + this.scrollY);
+        console.log('to: ' + y);
         const animatedValue = new Animated.Value(this.scrollY);
         const id = animatedValue.addListener(({ value }) => {
             this.scrollView.scrollTo({ x: 0, y: value, animated: false });
         });
+        Animated.spring(animatedValue, { toValue: y }).start(() => { animatedValue.removeListener(id); /* finished callback */ });
+    }
+
+    /*
         Animated.timing(animatedValue, { toValue: 0, duration: 250, easing: Easing.linear })
         .start(() => { animatedValue.removeListener(id); });
-    }
+    */
     renderTitleArea() {
         return (
             <View style={{ width: '100%', paddingTop: moderateScale(4), paddingBottom: moderateScale(20) }}>
@@ -591,23 +632,25 @@ class PlacePage extends Component {
         );
     }
     windowHeight = Dimensions.get('window').height;
+    /*
+    */
     render() {
         console.log('render placePage: ' + JSON.stringify(this.props.placePageModel.place));
         return (
             <ScrollView
                 ref={(ref) => { this.scrollView = ref; }}
-                contentContainerStyle={{ flexGrow: 1 }}
-                scrollEnabled={this.state.scrollEnabled}
                 onScroll={(event) => {
                     this.scrollY = event.nativeEvent.contentOffset.y;
                 }}
                 scrollEventThrottle={16}
+                contentContainerStyle={{ flexGrow: 1 }}
+                scrollEnabled={this.state.scrollEnabled}
                 
             >
                 <View style={{ height: (this.windowHeight - Header.HEIGHT) }}>
                     <View style={{ height: '60%' }}>
                         {this.renderTopArea()}
-                        {this.renderSwiperArea()}
+                        {this.renderSnapCarouselArea()}
                     </View>
                     {this.renderBottomArea()}
                 </View>
@@ -617,7 +660,7 @@ class PlacePage extends Component {
         );
     }
 }
-
+// {this.renderSwiperArea()}
 export default inject('placePageModel')(observer(PlacePage));
 
 /*
