@@ -73,6 +73,8 @@ export default class ArrowPageModel {
     }
 
     distance = 0;
+
+    shouldShowClear = false;
 }
 decorate(ArrowPageModel, {
     isShowingDirection: observable, // is used by swipeNavigationPage reaction
@@ -80,5 +82,6 @@ decorate(ArrowPageModel, {
     radius: observable,
     predefinedPlaces: observable,
     location: observable,
-    distance: observable
+    distance: observable,
+    shouldShowClear: observable
 });

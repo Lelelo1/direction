@@ -7,6 +7,7 @@
  */
 
 import React, { Component } from 'react';
+import  { AsyncStorage, AppState } from 'react-native';
 import ArrowPageModel from './ArrowPageModel';
 import { Provider } from 'mobx-react';
 import SwipeNavigationPageModel from './SwipeNavigationPageModel';
@@ -20,7 +21,9 @@ const Provider = {
 };
 */
 export default class App extends Component {
-  
+  componentDidMount() {
+    // AppState.addEventListener('change', this.handleAppStateExit);
+  }
   render() {
     return (
       <Provider

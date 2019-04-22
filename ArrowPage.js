@@ -6,17 +6,22 @@ import {
     PixelRatio,
     TextInput,
     TouchableOpacity,
-    ScrollView
+    ScrollView,
+    ViewPropTypes,
+    Dimensions
 } from 'react-native';
 // import Swipeout from 'react-native-swipeout';
 import Qs from 'qs'; // use encode false when creating query arguments
 import Icon from 'react-native-vector-icons/MaterialIcons';
 import PlaceInfoIcon from 'react-native-vector-icons/SimpleLineIcons';
+import WalkIcon from 'react-native-vector-icons/FontAwesome5'
+import PlaceIcon from 'react-native-vector-icons/MaterialCommunityIcons';
+import MultiStateButton from './MultiStateButton';
 import AutoHeightImage from 'react-native-auto-height-image';
 import ArrowPageModel from './ArrowPageModel';
 import SwipeNavigationPageModel from './SwipeNavigationPageModel';
 import { GooglePlacesAutocomplete } from 'react-native-google-places-autocomplete';
-import { scale, moderateScale } from 'react-native-size-matters';
+import { scale, moderateScale, verticalScale } from 'react-native-size-matters';
 import { inject, observer } from 'mobx-react';
 import { toJS, reaction } from 'mobx';
 import Utils from './Utils';
@@ -46,16 +51,13 @@ class ArrowPage extends Component {
             <View
                 style={{
                     alignItems: 'center',
-                    justifyContent: 'space-evenly',
                     width: scale(100),
                     height: '100%',
-                    flexDirection: 'row',
-                    paddingRight: scale(6),
+                    flexDirection: 'row-reverse',
                 }}
             >
-                
-                {this.renderPlaceInfoButton(navigation, iconSize)}
                 <TouchableOpacity
+                    style={{ paddingRight: scale(12) }}
                     onPress={() => {
                         navigation.navigate('Settings');
                     }}
@@ -66,9 +68,12 @@ class ArrowPage extends Component {
                         style={{ width: iconSize, height: iconSize }}
                     />
                 </TouchableOpacity>
+
             </View>
         );
     }
+    /*
+    // {this.renderPlaceInfoButton(navigation, iconSize)}
     static renderPlaceButton(navigation, iconSize) {
         const shouldRender = ArrowPageModel.getInstance().isShowingDirection;
         return shouldRender ? (
@@ -126,6 +131,7 @@ class ArrowPage extends Component {
             });
         }
     }
+    */
     constructor() {
         super();
         self = this;
@@ -147,6 +153,9 @@ class ArrowPage extends Component {
             }
             SwipeNavigationPageModel.getInstance().index = 1;
         });
+
+        /*
+
         this.reactionOnShowPlaceButton = reaction(() => this.props.swipeNavigationPageModel.showPlaceInfoButton, (show, reaction) => {
             this.updateHeaderRight();
         }, {});
@@ -154,6 +163,7 @@ class ArrowPage extends Component {
             this.updateHeaderRight();
         }, {});
 
+        */
         /* need to fix swipe out issue: https://github.com/mobxjs/mobx-react/issues/510
         this.reactionOnScrollEnabled = reaction(() => this.props.swipeNavigationPageModel.scrollEnabled, (scrollEnabled, reaction) => {
             console.log('reaction');
@@ -171,14 +181,10 @@ class ArrowPage extends Component {
 
         // this.reactionOnScrollEnabled();
     }
-    updateHeaderRight() {
-        const { setParams } = this.props.navigation;
-        // setParams({ title });
-        setParams({});
-    }
+
     navigateInfoPlace() { // show listview on return if it was open
-        const showListViewOnReturn = this.googlePlacesAutocomplete.state.listViewDisplayed;
-        this.props.navigation.navigate('Place', { pageType: 'infoPlace', showListViewOnReturn });
+        // const showListViewOnReturn = this.googlePlacesAutocomplete.state.listViewDisplayed;
+        this.props.navigation.navigate('Place', { pageType: 'infoPlace', showListViewOnReturn: true });
     }
     renderSwipeoutButtons(data) {
         console.log('render swipeoutButtons'); // https://github.com/dancormier/react-native-swipeout/issues/327
@@ -225,7 +231,53 @@ class ArrowPage extends Component {
             }
         ];
     }
-
+    getAvoidMakingIndexActive() {
+        if (this.props.arrowPageModel.isShowingDirection) {
+            return [1];
+        }
+        return [];
+    }
+    renderMultiStateButton() {
+        return (
+            <MultiStateButton
+                ref={(ref) => { this.multiStateButton = ref; }}
+                disablePressOnAlreadyActiveButton={[0]}
+                avoidMakingIndexActive={this.getAvoidMakingIndexActive()}
+                onPress={(index) => {
+                    if (this.props.arrowPageModel.shouldShowClear) {
+                        if (index === 0) {
+                            if (!this.props.arrowPageModel.isShowingDirection) {
+                                const details = this.props.placePageModel.place.details;
+                                ArrowPageModel.getInstance().setDestination(details.geometry.location);
+                            } else {
+                                // do nothing
+                            }
+                        } else {
+                            // is index 1
+                            this.props.navigation.navigate('Place', { pageType: 'destination', showListViewOnReturn: false });
+                        }
+                    }
+                }}
+            >
+                <WalkIcon name={'walking'} size={moderateScale(20)} />
+                <PlaceIcon name={'text'} size={moderateScale(20)} />
+            </MultiStateButton>
+        );
+    }
+    renderClearButton() {
+        return (
+            <TouchableOpacity
+                disabled={!this.props.arrowPageModel.shouldShowClear}
+                onPress={() => {
+                    this.googlePlacesAutocomplete.setAddressText('');
+                    ArrowPageModel.getInstance().setDestination('');
+                    ArrowPageModel.getInstance().shouldShowClear = false;
+                }}
+            >
+                <Icon name={'clear'} size={moderateScale(33)} color={this.props.arrowPageModel.shouldShowClear ? 'black' : 'transparent'} />
+            </TouchableOpacity>
+        );
+    }
     render() {
         return (
             <ScrollView
@@ -309,17 +361,24 @@ class ArrowPage extends Component {
                     listViewDisplayed={false}
                     fetchDetails={true}
                     onPress={(data, details) => {
-                        console.log('press');
-                        console.log(JSON.stringify(data), JSON.stringify(details));
-                        ArrowPageModel.getInstance().setDestination(details.geometry.location);
-                        PlacePageModel.getInstance().setPlace({ data, details });
-
+                        if (this.multiStateButton.activeIndex === 0) {
+                            ArrowPageModel.getInstance().setDestination(details.geometry.location);
+                            PlacePageModel.getInstance().setPlace({ data, details });
+                        } else if (this.multiStateButton.activeIndex === 1) {
+                            PlacePageModel.getInstance().setPlace({ data, details });
+                            this.navigateInfoPlace();
+                        } else {
+                            console.warn('error');
+                        }
+                        ArrowPageModel.getInstance().shouldShowClear = true;
                     }}
                     onLongPress={(data, details) => {
+                        /*
                         console.log('long hold: ' + JSON.stringify(data), JSON.stringify(details));
                         SwipeNavigationPageModel.getInstance().showPlaceInfoButton = false; // cancel previous animation when long pressing fast on different items
                         PlacePageModel.getInstance().setPlace({ data, details }); // need to set 
                         SwipeNavigationPageModel.getInstance().showPlaceInfoButton = true;
+                        */
                     }}
                     onClear={() => {
                         ArrowPageModel.getInstance().setDestination(null);
@@ -328,18 +387,10 @@ class ArrowPage extends Component {
                     buttonWidth={scale(55)}
                     // api={'GooglePlacesSearch'} can't use GooglePlacesSearch beacuse shows too many results: https://stackoverflow.com/questions/55440295/flatlist-with-position-absolute-dont-scroll 
                 />
-        
                 <View style={{ height: 44, width: '100%' }} />
-                <View style={{ alignItems: 'flex-end', paddingTop: moderateScale(11), paddingRight: moderateScale(11) }}>
-                    <TouchableOpacity
-                        disabled={!this.props.arrowPageModel.isShowingDirection}
-                        onPress={() => {
-                            this.googlePlacesAutocomplete.setAddressText('');
-                            ArrowPageModel.getInstance().setDestination('');
-                        }}
-                    >
-                        <Icon name={'clear'} size={scale(33)} color={this.props.arrowPageModel.isShowingDirection ? 'black' : 'transparent'} />
-                    </TouchableOpacity>
+                <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginHorizontal: scale(5), height: verticalScale(40) }}>
+                    {this.renderMultiStateButton()}
+                    {this.renderClearButton()}
                 </View>
                 <View style={{ flex: 1, width: '93%', alignItems: 'center', alignSelf: 'center', justifyContent: 'center' }}>
 
@@ -370,7 +421,7 @@ class ArrowPage extends Component {
   */
 }
 
-export default inject('arrowPageModel', 'swipeNavigationPageModel')(observer(ArrowPage));
+export default inject('arrowPageModel', 'swipeNavigationPageModel', 'placePageModel')(observer(ArrowPage));
 
 /**
  * in googleplacesautcomplete
