@@ -19,7 +19,7 @@ export default class PlacePageModel {
             // create url
             if (place.details.photos) {
                 place.details.photos.forEach(photo => {
-                    photo.url = `https://maps.googleapis.com/maps/api/place/photo?maxwidth=${photo.width}&photoreference=${photo.photo_reference}&key=${Utils.getInstance().key}`;
+                    photo.url = `https://maps.googleapis.com/maps/api/place/photo?maxwidth=${photo.width}&photoreference=${photo.photo_reference}&key=${Utils.getInstance().key}`; // can create uri instead of url
                 });
             }
 

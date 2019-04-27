@@ -22,6 +22,7 @@ import StarRating from 'react-native-star-rating';
 // import { GiftedChat,Bubble } from "react-native-gifted-chat"; how to use?
 import Carousel from 'react-native-snap-carousel';
 import Swiper from './Swiper';
+import TimeAgo from 'react-native-timeago';
 
 class PlacePage extends Component {
 
@@ -35,7 +36,7 @@ class PlacePage extends Component {
         showClockIcon: false,
         scrollEnabled: false,
     }
-// infoPlace destinationVisited or destination depending on pagetype given in naviagtion prop
+// infoPlace destinationVisited or destination depending on pagetype given in naviagtion prop // NO
     componentDidMount() {
         // console.log(JSON.stringify(this.props.placePageModel.place));
         this.didFocus = this.props.navigation.addListener('didFocus', () => {
@@ -47,6 +48,14 @@ class PlacePage extends Component {
                 SwipeNavigationPageModel.getInstance().showPlaceInfoButton = false;
             }         
         });
+        const place = this.props.placePageModel;
+        try {
+            if (place.data.isPredefinedPlace && !place.data.placeID) { // only try to request if place id does not exist
+                // request detail
+            }
+        } catch (ex) {
+            //
+        }
     }
     getPriceLevel(number) {
         switch (number) {
@@ -75,7 +84,7 @@ class PlacePage extends Component {
         return priceLevel ? (
             <View
                 style={{
-                    flexDirection: 'column',
+                    flexDirection: 'row',
                     alignItems: 'center',
                     backgroundColor: 'rgba(186, 152, 111, 0.7)',
                     alignSelf: 'center',
@@ -83,24 +92,14 @@ class PlacePage extends Component {
                     padding: moderateScale(2),
                 }}
             >
-                <View
-                    style={{
-                        flexDirection: 'row',
-                        // backgroundColor: 'rgba(140, 105, 64, 0.4)',
-                        padding: moderateScale(2),
-                        paddingBottom: 0,
-                        alignItems: 'center'
-                    }}
-                >
-                    <UserMoney name={'money'} size={moderateScale(20)} />
-                    <Text style={{ paddingLeft: moderateScale(2) }}>Price level</Text>
-                </View>
+                <UserMoney name={'money'} size={moderateScale(20)} style={{ padding: moderateScale(2) }} />
                 <Text style={{ fontWeight: 'bold', fontSize: moderateScale(16), padding: moderateScale(2) }}>{this.getPriceLevel(priceLevel)}</Text>
+                <Text style={{ padding: moderateScale(2) }}>price level</Text>
             </View>
 
         )
         :
-        null;
+        this.renderTimeAgo();
     }
     windowWidth = Dimensions.get('window').width;
     // swiperWidth = scale(this.windowWidth - scale(30));
@@ -160,14 +159,13 @@ class PlacePage extends Component {
     carouselIndex = 0;
     getSnapCarousel() {
         let photos = this.props.placePageModel.place.details.photos;
-        photos = photos.map(photo => { photo.uri = photo.url; return photo; });
-        return photos ? ( // wrapped in view so that if no photos present it still take up the area
-            <Swiper data={photos} showButtons={true} />
-        )
-        :
-        (
-            <View style={{ flex: 1 }} />
-        );
+        if (photos) {
+            if (photos.length > 0) {
+                photos = photos.map(photo => { photo.uri = photo.url; return photo; });
+                return <Swiper data={photos} showButtons={true} />
+            }
+        }
+        return <View style={{ flex: 1 }} />;
     }
     renderSnapCarouselArea() {
         return (
@@ -326,6 +324,17 @@ class PlacePage extends Component {
         return null;
     }
     // {this.renderTimeTable(openingHours)}
+    renderTimeAgo() {
+        const timeCreated = this.props.placePageModel.place.data.timeCreated;
+        return timeCreated ? (
+            <View style={{ flexDirection: 'row', padding: moderateScale(5), backgroundColor: '#dce2ed'}}>
+                <Text>... was added </Text>
+                <TimeAgo time={timeCreated} />
+            </View>
+        )
+        :
+        null;
+    }
     renderIcon() {
         const icon = this.props.placePageModel.place.details.icon;
         return icon ? (
@@ -454,6 +463,28 @@ class PlacePage extends Component {
         :
         null;
     }
+    getPanelStyle() {
+        return (this.renderPhoneButton() || this.renderGoogleButton() || this.renderWebsiteButton()) ? (
+            {
+                flexDirection: 'row',
+                justifyContent: 'space-evenly',
+                width: '90%',
+                borderWidth: 2,
+                borderColor: 'black',
+                backgroundColor: '#dce2ed',
+                shadowColor: 'grey',
+                shadowOffset: { width: 3, height: 8 },
+                shadowOpacity: 0.8,
+                shadowRadius: 20,
+                alignContent: 'center',
+                alignItems: 'center',
+                paddingVertical: verticalScale(12),
+                opacity: 0.7
+            }
+        )
+        :
+        null; 
+    }
     renderBottomArea() {
         return (
             <ImageBackground source={require('./path.png')} style={{ flex: 1, width: undefined, height: undefined }}>
@@ -470,22 +501,7 @@ class PlacePage extends Component {
                 >
                     {/*  mail, phone, website, google  */}
                     <View
-                        style={{
-                            flexDirection: 'row',
-                            justifyContent: 'space-evenly',
-                            width: '90%',
-                            borderWidth: 2,
-                            borderColor: 'black',
-                            backgroundColor: '#dce2ed',
-                            shadowColor: 'grey',
-                            shadowOffset: { width: 3, height: 8 },
-                            shadowOpacity: 0.8,
-                            shadowRadius: 20,
-                            alignContent: 'center',
-                            alignItems: 'center',
-                            paddingVertical: verticalScale(12),
-                            opacity: 0.7
-                        }}
+                        style={this.getPanelStyle()}
                     >
                         {this.renderPhoneButton()}
                         {this.renderGoogleButton()}
@@ -613,12 +629,29 @@ class PlacePage extends Component {
         .start(() => { animatedValue.removeListener(id); });
     */
     renderTitleArea() {
+        
+        const place = this.props.placePageModel.place;
+        console.log('renderTitleArea: ' + JSON.stringify(this.props.placePageModel.place));
+        let name = place.details.name;
+        let address = place.details.formatted_address;
+
+        console.log('xx: ' + JSON.stringify(place.data));
+
+        try {
+            if (place.data.isPredefinedPlace) { // is a marked location from settings page
+                name = place.data.name;
+                address = place.data.address.formatted_address;
+            }
+        } catch (ex) {
+            //
+        }
+
         return (
             <View style={{ width: '100%', paddingTop: moderateScale(4), paddingBottom: moderateScale(20) }}>
                 <View style={{ width: '75%', alignSelf: 'center', alignItems: 'center' }}>
-                    <Text style={{ fontSize: moderateScale(22), textAlign: 'center' }}>{this.props.placePageModel.place.details.name}</Text>
+                    <Text style={{ fontSize: moderateScale(22), textAlign: 'center' }}>{name}</Text>
                 </View>
-                <Text style={{ marginTop: verticalScale(5), alignSelf: 'center' }}>{this.props.placePageModel.place.details.formatted_address}</Text>
+                <Text selectable={true} style={{ marginTop: verticalScale(5), alignSelf: 'center' }}>{address}</Text>
             </View>
         );
     }

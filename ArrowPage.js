@@ -361,11 +361,11 @@ class ArrowPage extends Component {
                     listViewDisplayed={false}
                     fetchDetails={true}
                     onPress={(data, details) => {
+                        PlacePageModel.getInstance().setPlace({ data, details });
+                        console.log('data: ' + JSON.stringify(data));
                         if (this.multiStateButton.activeIndex === 0) {
                             ArrowPageModel.getInstance().setDestination(details.geometry.location);
-                            PlacePageModel.getInstance().setPlace({ data, details });
                         } else if (this.multiStateButton.activeIndex === 1) {
-                            PlacePageModel.getInstance().setPlace({ data, details });
                             this.navigateInfoPlace();
                         } else {
                             console.warn('error');
