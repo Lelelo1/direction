@@ -273,6 +273,17 @@ class SettingsPage extends Component {
                                             console.log('2: ' + JSON.stringify(address.results[0].formatted_address));
                                             const predefinedPlaces = ArrowPageModel.getInstance().predefinedPlaces;
                                             predefinedPlaces.push({ name: '', description: '', address: address.results[0], geometry: { location: { lat: location.latitude, lng: location.longitude } }, timeCreated: new Date(), isPredefinedPlace: true });
+                                            
+                                            /*
+                                            const items = [];
+                                            const predefinedPlace = { name: '', description: '', address: address.results[0], geometry: { location: { lat: location.latitude, lng: location.longitude } }, timeCreated: new Date(), isPredefinedPlace: true };
+                                            predefinedPlaces.forEach(p => {
+                                                items.push(p);
+                                            });
+                                            items.push(predefinedPlace);
+                                            predefinedPlaces.replace(items);
+                                            */
+
                                             this.setState({ showEnterNameDialog: true });
                                         } else {
                                             this.error = 'did not recive address for this location';

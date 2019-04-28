@@ -176,10 +176,12 @@ class ArrowPage extends Component {
         this.didBlurListener.remove();
         this.willFocusListener.remove();
         this.didFocusListener.remove();
+        /*
         this.reactionOnShowPlaceButton();
         this.reactionOnIsShowingDirection();
-
+        */
         // this.reactionOnScrollEnabled();
+        this.reactionOnPredefinedPlaceChanged();
     }
 
     navigateInfoPlace() { // show listview on return if it was open

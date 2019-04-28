@@ -328,7 +328,7 @@ class PlacePage extends Component {
         const timeCreated = this.props.placePageModel.place.data.timeCreated;
         return timeCreated ? (
             <View style={{ flexDirection: 'row', padding: moderateScale(5), backgroundColor: '#dce2ed'}}>
-                <Text>... was added </Text>
+                <Text>...was added </Text>
                 <TimeAgo time={timeCreated} />
             </View>
         )
