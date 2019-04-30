@@ -11,6 +11,7 @@ import Utils from './Utils';
 import Geolocation from 'react-native-geolocation-service';
 import { inject, observer } from 'mobx-react';
 import { observable } from 'mobx';
+import Center from './Center';
 
 class SettingsPage extends Component {
 
@@ -51,9 +52,11 @@ class SettingsPage extends Component {
         */
        if (!this.lastVal) this.lastVal = this.state.initialValue;
        const valDif = Math.abs(val - this.lastVal);
+       /*
        console.log('val: ' + val);
        console.log('lastVal: ' + this.lastVal);
        console.log('valDif: ' + valDif);
+       */
         if (valDif > 0.01) {
             const ratio = (this.maxv - this.minv) / (this.maxp - this.minp);
             let radius = Math.exp(this.minv + (ratio * (val - this.minp)));
@@ -207,19 +210,72 @@ class SettingsPage extends Component {
         :
         null;
     }
+    getEye() {
+        return this.props.arrowPageModel.isShowingResultsWhereFacing ? 'eye' : 'eye-with-line';
+    }
+    renderShowResultsWhereFacingSettings() {
+        return (
+            <View
+                style={{
+                    flexDirection: 'row',
+                    justifyContent: 'space-between',
+                    alignItems: 'center',
+                    paddingBottom: this.paddingChildrenBottom, 
+                    paddingRight: this.paddingChildrenRight
+                }}
+            >
+                <Text>Show results where I am facing</Text>
+                <Center component={this.renderEyeButton()} width={moderateScale(32)} />
+            </View>
+        );
+    }
+    renderEyeButton() {
+        return (
+            <TouchableOpacity
+                onPress={() => {
+                    ArrowPageModel.getInstance().isShowingResultsWhereFacing = !this.props.arrowPageModel.isShowingResultsWhereFacing;
+                }}
+            >
+                <Icon
+                    name={this.getEye()}
+                    size={moderateScale(32)}
+                />
+            </TouchableOpacity>
+        )
+    }
+    renderPinButton() {
+        return (
+            <TouchableOpacity
+                style={{
+                    backgroundColor: 'teal',
+                    borderRadius: moderateScale(43) / 2,
+                    width: moderateScale(38),
+                    height: moderateScale(38),
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                }}
+                onPress={() => {
+                    this.setPin();
+                }}
+            >
+                <Icon name={'pin'} size={moderateScale(23)} />
+            </TouchableOpacity>
+        );
+    }
+
+    paddingChildrenRight = scale(20);
+    paddingChildrenBottom = verticalScale(20) // spacing of the children
     render() {
         return (
             <View
             style={{ 
                 paddingVertical: verticalScale(30),
-                paddingHorizontal: scale(20),
+                paddingHorizontal: scale(20)
                 }}
             >
 
                 <View
-                    style={{
-                        height: verticalScale(75)
-                    }}
+                    style={{ paddingBottom: this.paddingChildrenBottom }}
                 >
                     <Text>Give me results within...</Text>
                     <Slider
@@ -230,7 +286,7 @@ class SettingsPage extends Component {
                             this.setDistance(value);
                         }}
                         value={this.state.initialValue}
-                        style={{ height: 40 }}
+                        // can't set height to that of the actual slider
                     />
                     <Animatable.View ref={(r) => { this.moreButton = r }} style={{ alignSelf: 'flex-start' }}>
                         <TouchableOpacity
@@ -247,77 +303,68 @@ class SettingsPage extends Component {
                         </TouchableOpacity>
                     </Animatable.View>
                 </View>
-                <View 
-                    style={{
-                        paddingTop: verticalScale(10),
-                        flexDirection: 'row',
-                        alignItems: 'center'
-                        }}
-                    >
-                    <Text>Find my way back to...</Text>
-                    <TouchableOpacity
-                        onPress={() => {
-                            // get location
-                            this.error = null;
-                            Geolocation.getCurrentPosition(
-                                (position) => {
-                                    console.log('position: ' + JSON.stringify(position.coords));
-                                    const location = position.coords;
-                                    key = 'AIzaSyBIHuu2CVqTKLmahKCE4wmHL3dStmIuViY';
-                                    fetch(`https://maps.googleapis.com/maps/api/geocode/json?latlng=${location.latitude},${location.longitude}&key=${key}`)
-                                    .then((response) => response.json())
-                                    .then((address) => {
-                                        console.log('address: ' + JSON.stringify(address)); 
-                                        if (address.results[0]) {
-                                            console.log('1: ' + JSON.stringify(address.results[0]));
-                                            console.log('2: ' + JSON.stringify(address.results[0].formatted_address));
-                                            const predefinedPlaces = ArrowPageModel.getInstance().predefinedPlaces;
-                                            predefinedPlaces.push({ name: '', description: '', address: address.results[0], geometry: { location: { lat: location.latitude, lng: location.longitude } }, timeCreated: new Date(), isPredefinedPlace: true });
-                                            
-                                            /*
-                                            const items = [];
-                                            const predefinedPlace = { name: '', description: '', address: address.results[0], geometry: { location: { lat: location.latitude, lng: location.longitude } }, timeCreated: new Date(), isPredefinedPlace: true };
-                                            predefinedPlaces.forEach(p => {
-                                                items.push(p);
-                                            });
-                                            items.push(predefinedPlace);
-                                            predefinedPlaces.replace(items);
-                                            */
+                
+                {this.renderShowResultsWhereFacingSettings()}
 
-                                            this.setState({ showEnterNameDialog: true });
-                                        } else {
-                                            this.error = 'did not recive address for this location';
-                                            this.setState({ showError: true });
-                                        }
-                                    }).catch((error) => { this.error = error; this.setState({ showError: true }); });
-                                },
-                                (error) => {
-                                    this.error = error;
-                                    this.setState({ showError: true });
-                                }
-                            );
-                        }}
-                    >
-                        <View
-                            style={{
-                                backgroundColor: 'teal',
-                                alignSelf: 'flex-start',
-                                borderRadius: moderateScale(43) / 2,
-                                width: moderateScale(38),
-                                height: moderateScale(38),
-                                alignItems: 'center',
-                                justifyContent: 'center',
-                            }}
-                        >
-                            <Icon name={'pin'} size={moderateScale(23)} />
-                        </View>
-                    </TouchableOpacity>
+                <View
+                    style={{
+                        flexDirection: 'row',
+                        alignItems: 'center',
+                        justifyContent: 'space-between',
+                        paddingRight: this.paddingChildrenRight,
+                        paddingBottom: this.paddingChildrenBottom
+                    }}
+                >
+                    <Text>Find my way back to...</Text>
+                    <Center component={this.renderPinButton()} width={moderateScale(38)} />
                 </View>
                 {this.renderRadiusDialog()}
                 {this.renderEnterNameDialog()}
                 {this.renderError()}
                 {/** also show types */}
             </View>
+        );
+    }
+    // move this to a viewmodel
+    setPin() {
+        // get location
+        this.error = null;
+        Geolocation.getCurrentPosition(
+            (position) => {
+                console.log('position: ' + JSON.stringify(position.coords));
+                const location = position.coords;
+                const key = 'AIzaSyBIHuu2CVqTKLmahKCE4wmHL3dStmIuViY';
+                fetch(`https://maps.googleapis.com/maps/api/geocode/json?latlng=${location.latitude},${location.longitude}&key=${key}`)
+                    .then((response) => response.json())
+                    .then((address) => {
+                        console.log('address: ' + JSON.stringify(address));
+                        if (address.results[0]) {
+                            console.log('1: ' + JSON.stringify(address.results[0]));
+                            console.log('2: ' + JSON.stringify(address.results[0].formatted_address));
+                            const predefinedPlaces = ArrowPageModel.getInstance().predefinedPlaces;
+                            predefinedPlaces.push({ name: '', description: '', address: address.results[0], geometry: { location: { lat: location.latitude, lng: location.longitude } }, timeCreated: new Date(), isPredefinedPlace: true });
+
+                            /*
+                            const items = [];
+                            const predefinedPlace = { name: '', description: '', address: address.results[0], geometry: { location: { lat: location.latitude, lng: location.longitude } }, timeCreated: new Date(), isPredefinedPlace: true };
+                            predefinedPlaces.forEach(p => {
+                                items.push(p);
+                            });
+                            items.push(predefinedPlace);
+                            predefinedPlaces.replace(items);
+                            */
+
+                            this.setState({ showEnterNameDialog: true });
+                        } else {
+                            this.error = 'did not recive address for this location';
+                            this.setState({ showError: true });
+                        }
+                    }).catch((error) => { this.error = error; this.setState({ showError: true }); });
+            },
+            (error) => {
+                this.error = error;
+                this.setState({ showError: true });
+            }
         );
     }
 }

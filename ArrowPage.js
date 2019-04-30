@@ -171,6 +171,26 @@ class ArrowPage extends Component {
             setParams({ swipeEnabled: scrollEnabled });
         }, {});
         */
+       /*
+        this.reactionOnLocationChanged = reaction(() => this.props.arrowPageModel.location, (location, reaction) => {
+            console.log('reacted on location changed');
+            if (this.props.arrowPageModel.isShowingResultsWhereFacing) {
+                const text = this.googlePlacesAutocomplete.getAddressText();
+                this.googlePlacesAutocomplete._request(text);
+            }
+        });
+        */
+        
+        // needed. But could try wrap googleplacesautocomplete in observer tags.
+        // react on location changed instead
+        this.reactionOnLocationAheadChanged = reaction(() => this.props.arrowPageModel.locationAhead, (locationAhead, reaction) => {
+            console.log('reacted on locationAheadChanged');
+            if (this.props.arrowPageModel.isShowingResultsWhereFacing) {
+                const text = this.googlePlacesAutocomplete.getAddressText();
+                this.googlePlacesAutocomplete._request(text);
+            }
+        });
+        
     }
     componentWillUnmount() {
         this.didBlurListener.remove();
@@ -181,7 +201,7 @@ class ArrowPage extends Component {
         this.reactionOnIsShowingDirection();
         */
         // this.reactionOnScrollEnabled();
-        this.reactionOnPredefinedPlaceChanged();
+        this.reactionOnQueryChanged();
     }
 
     navigateInfoPlace() { // show listview on return if it was open
@@ -290,32 +310,44 @@ class ArrowPage extends Component {
                 keyboardShouldPersistTaps={'handled'} // neccesary to prevent listview items to have to be pressed twice
                 scrollEnabled={false}
             >
-                <GooglePlacesAutocomplete
+                <GooglePlacesAutocomplete // internal problem - listview not updating the first time focusing it and turning
                     ref={(ref) => { this.googlePlacesAutocomplete = ref; }}
                     placeholder='search'
-                    textInputProps={{ onFocus: () => {
-                        Geolocation.getCurrentPosition((position) => {
-                            console.log('position: ' + JSON.stringify(position));
-                            const pageModel = this.props.arrowPageModel;
-                            pageModel.location.latitude = position.coords.latitude;
-                            pageModel.location.longitude = position.coords.longitude;
-                        }, (error) => {
-                            console.log(error);
-                            console.warn(error);
-                        });
-                    },
+                    textInputProps={{
+                        onFocus: () => {
+                            console.log('focus');
+                            Geolocation.getCurrentPosition((position) => {
+                                console.log('position: ' + JSON.stringify(position));
+                                const pageModel = this.props.arrowPageModel;
+                                pageModel.location.latitude = position.coords.latitude;
+                                pageModel.location.longitude = position.coords.longitude;
+
+                                if (pageModel.isShowingResultsWhereFacing) {
+                                    ArrowPageModel.getInstance().shouldCalculatePointWhereFacing = true;
+                                    pageModel.startCompass(); 
+                                }
+                                 // no need to check isShowingDirection to limit
+
+                            }, (error) => {
+                                console.log(error);
+                                console.warn(error);
+                            });
+                        },
                         clearButtonMode: 'never',
                         spellCheck: false,
                         autoCorrect: false,
                         rejectResponderTermination: true
                     }}
-                    query={{
-                        key: Utils.getInstance().key,
-                        radius: this.props.arrowPageModel.getRadius(),
-                        location: this.props.arrowPageModel.getLocationAsString(),
-                        strictbounds: this.props.arrowPageModel.getRadius() ? 'strictbounds' : undefined,
-                        sessiontoken: 'aqse34fr5hnj78l9g4s2svfbm377912kde'
+                    onBlur={() => { // can't be passed with textInput props since already used internally
+                        
+                        // blur occures after showTheWay need check 
+                        if (!this.props.arrowPageModel.isShowingDirection) {
+                            ArrowPageModel.getInstance().stopCompass();
+                        } else {
+                            ArrowPageModel.getInstance().shouldCalculatePointWhereFacing = false;
+                        }
                     }}
+                    query={this.props.arrowPageModel.getQuery()}
                     /* can't use this
                     https://github.com/FaridSafi/react-native-google-places-autocomplete/issues/373
                     */
@@ -387,7 +419,7 @@ class ArrowPage extends Component {
                     }}
                     renderSwipeoutButtons={(rowData) => this.renderSwipeoutButtons(rowData)}
                     buttonWidth={scale(55)}
-                    // api={'GooglePlacesSearch'} can't use GooglePlacesSearch beacuse shows too many results: https://stackoverflow.com/questions/55440295/flatlist-with-position-absolute-dont-scroll 
+                    api={this.props.arrowPageModel.api} // can't use GooglePlacesSearch beacuse shows too many results: https://stackoverflow.com/questions/55440295/flatlist-with-position-absolute-dont-scroll 
                 />
                 <View style={{ height: 44, width: '100%' }} />
                 <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginHorizontal: scale(5), height: verticalScale(40) }}>

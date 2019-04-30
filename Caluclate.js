@@ -30,10 +30,42 @@ export default class Calculate {
         const dLng = this.toRadians(lng2 - lng1);
 
         const a = Math.sin(dLat / 2) * Math.sin(dLat / 2) +
-        Math.cos(this.toRadians(lat1)) * Math.cos(this.toRadians(lat2)) *
-        Math.sin(dLng / 2) * Math.sin(dLng / 2);
-        const  c = 2* Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+            Math.cos(this.toRadians(lat1)) * Math.cos(this.toRadians(lat2)) *
+            Math.sin(dLng / 2) * Math.sin(dLng / 2);
+        const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
         const dist = (earthRadius * c);
-        return dist
-      }
+        return dist;
+    }
+
+    // https://stackoverflow.com/questions/3225803/calculate-endpoint-given-distance-bearing-starting-point
+    static FindPointAtDistanceFrom(startLat, startLon, initialBearingDegrees, distanceMeters) {
+        // GeoLocation startPoint
+        const initialBearingRadians = this.toRadians(initialBearingDegrees);
+        const distanceKilometres = distanceMeters / 1000;
+        const radiusEarthKilometres = 6371.01;
+        const distRatio = distanceKilometres / radiusEarthKilometres;
+        const distRatioSine = Math.sin(distRatio);
+        const distRatioCosine = Math.cos(distRatio);
+
+        const startLatRad = this.toRadians(startLat);
+        const startLonRad = this.toRadians(startLon);
+
+        const startLatCos = Math.cos(startLatRad);
+        const startLatSin = Math.sin(startLatRad);
+
+        const endLatRads = Math.asin((startLatSin * distRatioCosine) + (startLatCos * distRatioSine * Math.cos(initialBearingRadians)));
+        const endLonRads = startLonRad
+            + Math.atan2(
+                Math.sin(initialBearingRadians) * distRatioSine * startLatCos,
+                distRatioCosine - startLatSin * Math.sin(endLatRads));
+
+        return { latitude: this.toDegrees(endLatRads), longitude: this.toDegrees(endLonRads) };
+        /*
+        return new GeoLocation
+        {
+            Latitude = RadiansToDegrees(endLatRads),
+            Longitude = RadiansToDegrees(endLonRads)
+        };
+        */
+    }
 }
