@@ -33,17 +33,22 @@ export default class ArrowPageModel {
         }
     }
     lastVal;
+    lastValReading;
     startCompass() { // May need to write stabilising solution // undvik compass reading om inte rört telefonen // men om står vid en avikelse 
         const degreeUpdateRate = 3;
-        RNSimpleCompass.start(degreeUpdateRate, (degree, x, y, z) => {
+        RNSimpleCompass.start(degreeUpdateRate, (degree, x, y, z, accuracy) => {
             // console.log('degree:' + degree);
             
             console.log('x: ' + x + ' y: ' + y + ' z: ' + z);
             let reading = Math.sqrt((x * x) + (y * y) + (z * z)); // https://stackoverflow.com/questions/9349376/sensormanager-magnetic-field-range
             reading = Math.round(reading * 10) / 10;
-            this.magneticFieldStrength = reading;
-           const d = Math.round((this.magneticFieldStrength - 50.8) * 10) / 10;
-           this.magneticFieldDisturbance = d;
+            if (!this.lastValReading) this.lastValReading = reading;
+            const mDif = Math.abs(this.lastValReading - reading);
+            if (mDif >= 0.1) {
+                this.magneticFieldStrength = reading;
+                this.magneticFieldDisturbance = Math.round((this.magneticFieldStrength - 50.8) * 10) / 10;
+                this.accuracy = accuracy;
+            }
 
             if (this.isShowingDirection) { // fires every time magnet change
                 this.showTheWay(degree);
@@ -158,6 +163,7 @@ export default class ArrowPageModel {
 
     magneticFieldStrength;
     magneticFieldDisturbance;
+    accuracy;
 }
 decorate(ArrowPageModel, {
     isShowingDirection: observable, // is used by swipeNavigationPage reaction
@@ -170,5 +176,5 @@ decorate(ArrowPageModel, {
     isShowingResultsWhereFacing: observable,
     locationAhead: observable,
     magneticFieldStrength: observable,
-    magneticFieldDisturbance: observable
+    // magneticFieldDisturbance: observable
 });

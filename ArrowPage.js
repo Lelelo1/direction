@@ -440,6 +440,7 @@ class ArrowPage extends Component {
                     <Text style={{ fontSize: moderateScale(20) }}>{this.props.arrowPageModel.distance} meters</Text>
                     <Text style={{ paddingTop: 20 }}>magneticFieldStrength: {this.props.arrowPageModel.magneticFieldStrength}μT</Text>
                     <Text style={{ paddingTop: 20 }}>magneticFieldDisturbance: {this.props.arrowPageModel.magneticFieldDisturbance}μT</Text>
+                    <Text style={{ paddingTop: 20 }}>accuracy: {this.props.arrowPageModel.accuracy}</Text>
                 </View>
                 <View style={{ width: '93%', alignSelf: 'center' }}>
                     <View style={{ flexDirection: 'row', justifyContent: 'space-between' }}>
