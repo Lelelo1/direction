@@ -3,6 +3,7 @@ import RNSimpleCompass from 'react-native-simple-compass';
 import Utils from './Utils';
 import Calculate from './Caluclate';
 import Geolocation from 'react-native-geolocation-service';
+import { Attitude, Barometer } from 'react-native-attitude';
 
 export default class ArrowPageModel {
     static instance = null;
@@ -140,15 +141,45 @@ export default class ArrowPageModel {
             sessiontoken: 'aqse34fr5hnj78l9g4s2svfbm377912kde'
         };
 
-        Object.keys(query).forEach((key) => { if(query[key] === undefined) delete query[key]}); // filer undefined properties
+        Object.keys(query).forEach((key) => { if (query[key] === undefined) delete query[key]; }); // filer undefined properties
         console.log('filtered query: ' + JSON.stringify(query));
         return query;
     }
     isShowingResultsWhereFacing = false;
     shouldCalculatePointWhereFacing = false;
     // for giving results where user is facing
+    attitudeListener;
+    headingListener;
+    startAttitude() {
+        this.attitudeListener = Attitude.watchAttitude((update) => {
+            /**
+             * update.roll (in degrees -180 (left) +180 (right))
+             * update.pitch (in degrees  -90 (down) +90 (up))
+            **/
+           console.log('update: ' + JSON.stringify(update));
+            const r = Math.round(update.attitude.roll);
+            const p = Math.round(update.attitude.pitch);
 
+            console.log('roll: ' + r + ' pitch: ' + p);
+            this.roll = r;
+            this.pitch = p;
+        });
 
+        /* uses compass activly
+        this.headingListener = Attitude.watchHeading((update) => {
+
+           const h = Math.round(update.heading);
+           this.heading = h;
+        });
+        */
+    }
+    stopAttitude() {
+        Attitude.stopObserving();
+        Attitude.clearWatchAttitude(this.attitudeListener);
+    }
+    roll;
+    pitch;
+    heading;
 }
 decorate(ArrowPageModel, {
     isShowingDirection: observable, // is used by swipeNavigationPage reaction
@@ -159,5 +190,8 @@ decorate(ArrowPageModel, {
     distance: observable,
     shouldShowClear: observable,
     isShowingResultsWhereFacing: observable,
-    locationAhead: observable
+    locationAhead: observable,
+    roll: observable,
+    pitch: observable,
+    heading: observable
 });

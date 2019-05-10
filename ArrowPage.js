@@ -190,7 +190,7 @@ class ArrowPage extends Component {
                 this.googlePlacesAutocomplete._request(text);
             }
         });
-        
+        ArrowPageModel.getInstance().startAttitude();
     }
     componentWillUnmount() {
         this.didBlurListener.remove();
@@ -202,6 +202,7 @@ class ArrowPage extends Component {
         */
         // this.reactionOnScrollEnabled();
         this.reactionOnQueryChanged();
+        ArrowPageModel.getInstance().stopAttitude();
     }
 
     navigateInfoPlace() { // show listview on return if it was open
@@ -438,6 +439,7 @@ class ArrowPage extends Component {
                         />
                     </View>
                     <Text style={{ fontSize: moderateScale(20) }}>{this.props.arrowPageModel.distance} meters</Text>
+                    <Text style={{ paddingTop: 20 }}>roll: {this.props.arrowPageModel.roll}</Text>
                 </View>
                 <View style={{ width: '93%', alignSelf: 'center' }}>
                     <View style={{ flexDirection: 'row', justifyContent: 'space-between' }}>
@@ -449,6 +451,7 @@ class ArrowPage extends Component {
             </ScrollView>
         );
     }
+    // pitch: {this.props.arrowPageModel.pitch}
   /*
     total is amount of tabs in AppNavigation.js  .wont be using tabs to due swipe problem
                 <Pagination total={2} index={this.props.swipeNavigationPageModel.index} />
