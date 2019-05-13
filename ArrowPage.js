@@ -439,7 +439,7 @@ class ArrowPage extends Component {
                         />
                     </View>
                     <Text style={{ fontSize: moderateScale(20) }}>{this.props.arrowPageModel.distance} meters</Text>
-                    <Text style={{ paddingTop: 20 }}>roll: {this.props.arrowPageModel.roll}</Text>
+                    <Text style={{ paddingTop: 20 }}>yaw: {this.props.arrowPageModel.yaw}</Text>
                 </View>
                 <View style={{ width: '93%', alignSelf: 'center' }}>
                     <View style={{ flexDirection: 'row', justifyContent: 'space-between' }}>

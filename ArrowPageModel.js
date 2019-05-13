@@ -5,6 +5,7 @@ import Calculate from './Caluclate';
 import Geolocation from 'react-native-geolocation-service';
 import { Attitude, Barometer } from 'react-native-attitude';
 
+
 export default class ArrowPageModel {
     static instance = null;
 
@@ -159,10 +160,11 @@ export default class ArrowPageModel {
            console.log('update: ' + JSON.stringify(update));
             const r = Math.round(update.attitude.roll);
             const p = Math.round(update.attitude.pitch);
-
-            console.log('roll: ' + r + ' pitch: ' + p);
+            const y = Math.round(update.attitude.yaw);
+            console.log('roll: ' + r + ' pitch: ' + p + " yaw: " + y);
             this.roll = r;
             this.pitch = p;
+            this.yaw = y;
         });
 
         /* uses compass activly
@@ -179,6 +181,7 @@ export default class ArrowPageModel {
     }
     roll;
     pitch;
+    yaw;
     heading;
 }
 decorate(ArrowPageModel, {
@@ -193,5 +196,6 @@ decorate(ArrowPageModel, {
     locationAhead: observable,
     roll: observable,
     pitch: observable,
+    yaw: observable,
     heading: observable
 });
