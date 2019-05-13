@@ -3,6 +3,7 @@ package com.direction;
 import android.app.Application;
 
 import com.facebook.react.ReactApplication;
+import com.sensors.RNSensorsPackage;
 import com.reactlibrary.RNSimpleCompassPackage;
 import com.agontuk.RNFusedLocation.RNFusedLocationPackage;
 import com.reactnativecommunity.slider.ReactSliderPackage;
@@ -28,6 +29,7 @@ public class MainApplication extends Application implements ReactApplication {
     protected List<ReactPackage> getPackages() {
       return Arrays.<ReactPackage>asList(
           new MainReactPackage(),
+            new RNSensorsPackage(),
             new RNSimpleCompassPackage(),
             new RNFusedLocationPackage(),
             new ReactSliderPackage(),

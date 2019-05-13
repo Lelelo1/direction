@@ -26,6 +26,7 @@
     "react-native-gesture-handler": "^1.0.17",
     "react-native-google-places-autocomplete": "^1.3.9",
     "react-native-popup-dialog": "^0.18.2",
+    "react-native-sensors": "git+https://github.com/Lelelo1/react-native-sensors.git#cal-magnetometer",
     "react-native-simple-compass": "git+https://github.com/Lelelo1/react-native-simple-compass.git",
     "react-native-size-matters": "^0.1.6",
     "react-native-snap-carousel": "^3.7.5",

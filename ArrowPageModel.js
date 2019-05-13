@@ -3,6 +3,7 @@ import RNSimpleCompass from 'react-native-simple-compass';
 import Utils from './Utils';
 import Calculate from './Caluclate';
 import Geolocation from 'react-native-geolocation-service';
+import { deviceMotion } from 'react-native-sensors';
 
 export default class ArrowPageModel {
     static instance = null;
@@ -38,18 +39,7 @@ export default class ArrowPageModel {
         const degreeUpdateRate = 3;
         RNSimpleCompass.start(degreeUpdateRate, (degree, x, y, z, accuracy) => {
             // console.log('degree:' + degree);
-            
-            console.log('x: ' + x + ' y: ' + y + ' z: ' + z);
-            let reading = Math.sqrt((x * x) + (y * y) + (z * z)); // https://stackoverflow.com/questions/9349376/sensormanager-magnetic-field-range
-            reading = Math.round(reading * 10) / 10;
-            if (!this.lastValReading) this.lastValReading = reading;
-            const mDif = Math.abs(this.lastValReading - reading);
-            if (mDif >= 0.1) {
-                this.magneticFieldStrength = reading;
-                this.magneticFieldDisturbance = Math.round((this.magneticFieldStrength - 50.8) * 10) / 10;
-                this.accuracy = accuracy;
-            }
-
+            this.startMagnetometer();
             if (this.isShowingDirection) { // fires every time magnet change
                 this.showTheWay(degree);
             } else { // this.isShowingResultsWhereFacing
@@ -100,7 +90,29 @@ export default class ArrowPageModel {
 
     stopCompass() {
         RNSimpleCompass.stop();
+        this.stopMagnetometer();
         console.log('stopped compass');
+    }
+    magnetometerListener;
+    startMagnetometer() {
+        this.magnetometerListener = deviceMotion.subscribe(({ mX, mY, mZ }) => {
+            
+            console.log('mX: ' + mX + ' mY: ' + mY + ' mZ: ' + mZ);
+            let reading = Math.sqrt((mX * mX) + (mY * mY) + (mZ * mZ)); // https://stackoverflow.com/questions/9349376/sensormanager-magnetic-field-range
+            reading = Math.round(reading * 10) / 10;
+            if (!this.lastValReading) this.lastValReading = reading;
+            const mDif = Math.abs(this.lastValReading - reading);
+            if (mDif >= 0.1) {
+                this.magneticFieldStrength = reading;
+                this.magneticFieldDisturbance = Math.round((this.magneticFieldStrength - 50.8) * 10) / 10;
+                // this.accuracy = accuracy;
+            }
+            
+        });
+    }
+
+    stopMagnetometer() {
+        this.magnetometerListener.unsubscribe();
     }
 
     rotate = '270deg'

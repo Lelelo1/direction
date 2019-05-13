@@ -52,6 +52,7 @@
 		9F08CB29EC844FD5982D16C3 /* AntDesign.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 2EC96C5ED421489299394F49 /* AntDesign.ttf */; };
 		ADBDB9381DFEBF1600ED6528 /* libRCTBlob.a in Frameworks */ = {isa = PBXBuildFile; fileRef = ADBDB9271DFEBF0700ED6528 /* libRCTBlob.a */; };
 		BEDF61B09CEE455F976A81BE /* Feather.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 02BC11BD35EA41259C266B3B /* Feather.ttf */; };
+		DBAA05CC3AD34E8E94CBAC32 /* libRNSensors.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 2CF32E7BCC7341AD896650F9 /* libRNSensors.a */; };
 		E01E5C94F19845478E744039 /* EvilIcons.ttf in Resources */ = {isa = PBXBuildFile; fileRef = C972B90C0C3F4F49B20C00E1 /* EvilIcons.ttf */; };
 		E8E70776B66C45C3B3ECF35D /* libRNGestureHandler.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 5F3155BE4A2247FB8D70F846 /* libRNGestureHandler.a */; };
 		EA36356EEA194695853C0208 /* libRNCSlider.a in Frameworks */ = {isa = PBXBuildFile; fileRef = BB390677DE4B41E8A01A7F68 /* libRNCSlider.a */; };
@@ -308,6 +309,13 @@
 			remoteGlobalIDString = 358F4ED71D1E81A9004DF814;
 			remoteInfo = RCTBlob;
 		};
+		B11DDF3122897F8A00E46099 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 13FD21B520EE4AEEB4EAA122 /* RNSensors.xcodeproj */;
+			proxyType = 2;
+			remoteGlobalIDString = 134814201AA4EA6300B7C361;
+			remoteInfo = RNSensors;
+		};
 		B12BFDE522843ACC002E96E7 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
 			containerPortal = 91A7829E21CA49CBB4CF8B4E /* RNSimpleCompass.xcodeproj */;
@@ -399,11 +407,13 @@
 		13B07FB51A68108700A75B9A /* Images.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; name = Images.xcassets; path = Direction/Images.xcassets; sourceTree = "<group>"; };
 		13B07FB61A68108700A75B9A /* Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; name = Info.plist; path = Direction/Info.plist; sourceTree = "<group>"; };
 		13B07FB71A68108700A75B9A /* main.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = main.m; path = Direction/main.m; sourceTree = "<group>"; };
+		13FD21B520EE4AEEB4EAA122 /* RNSensors.xcodeproj */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = "wrapper.pb-project"; name = RNSensors.xcodeproj; path = "../node_modules/react-native-sensors/ios/RNSensors.xcodeproj"; sourceTree = "<group>"; };
 		146833FF1AC3E56700842450 /* React.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = React.xcodeproj; path = "../node_modules/react-native/React/React.xcodeproj"; sourceTree = "<group>"; };
 		1B655EA1C6FB41CF97559708 /* Octicons.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = Octicons.ttf; path = "../node_modules/react-native-vector-icons/Fonts/Octicons.ttf"; sourceTree = "<group>"; };
 		1BEBC73DD9484986B561B18A /* Ionicons.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = Ionicons.ttf; path = "../node_modules/react-native-vector-icons/Fonts/Ionicons.ttf"; sourceTree = "<group>"; };
 		21B1167DDB7C44B4821EF239 /* Zocial.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = Zocial.ttf; path = "../node_modules/native-base/Fonts/Zocial.ttf"; sourceTree = "<group>"; };
 		2A146B82EF4944C9AC8D192C /* Octicons.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = Octicons.ttf; path = "../node_modules/native-base/Fonts/Octicons.ttf"; sourceTree = "<group>"; };
+		2CF32E7BCC7341AD896650F9 /* libRNSensors.a */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = archive.ar; path = libRNSensors.a; sourceTree = "<group>"; };
 		2D02E47B1E0B4A5D006451C7 /* Direction-tvOS.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "Direction-tvOS.app"; sourceTree = BUILT_PRODUCTS_DIR; };
 		2D02E4901E0B4A5D006451C7 /* Direction-tvOSTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = "Direction-tvOSTests.xctest"; sourceTree = BUILT_PRODUCTS_DIR; };
 		2D16E6891FA4F8E400B85C8A /* libReact.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; path = libReact.a; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -473,6 +483,7 @@
 				E8E70776B66C45C3B3ECF35D /* libRNGestureHandler.a in Frameworks */,
 				EA36356EEA194695853C0208 /* libRNCSlider.a in Frameworks */,
 				6652188225DF4416A0B85248 /* libRNSimpleCompass.a in Frameworks */,
+				DBAA05CC3AD34E8E94CBAC32 /* libRNSensors.a in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -704,6 +715,7 @@
 				511357448D6E46BB85576897 /* RNGestureHandler.xcodeproj */,
 				A22ED962BDDD46FD9EFD7AC4 /* RNCSlider.xcodeproj */,
 				91A7829E21CA49CBB4CF8B4E /* RNSimpleCompass.xcodeproj */,
+				13FD21B520EE4AEEB4EAA122 /* RNSensors.xcodeproj */,
 			);
 			name = Libraries;
 			sourceTree = "<group>";
@@ -753,6 +765,14 @@
 			name = Products;
 			sourceTree = "<group>";
 		};
+		B11DDF2E22897F8900E46099 /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				B11DDF3222897F8A00E46099 /* libRNSensors.a */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
 		B12BFDE222843ACC002E96E7 /* Products */ = {
 			isa = PBXGroup;
 			children = (
@@ -769,6 +789,7 @@
 				BB390677DE4B41E8A01A7F68 /* libRNCSlider.a */,
 				F2BE80B152F2402497FC2FAF /* libRNVectorIcons-tvOS.a */,
 				312C638BFC8245758A7D9F04 /* libRNSimpleCompass.a */,
+				2CF32E7BCC7341AD896650F9 /* libRNSensors.a */,
 			);
 			name = "Recovered References";
 			sourceTree = "<group>";
@@ -969,6 +990,10 @@
 				{
 					ProductGroup = B1E2807C22525C9C00BD5486 /* Products */;
 					ProjectRef = 511357448D6E46BB85576897 /* RNGestureHandler.xcodeproj */;
+				},
+				{
+					ProductGroup = B11DDF2E22897F8900E46099 /* Products */;
+					ProjectRef = 13FD21B520EE4AEEB4EAA122 /* RNSensors.xcodeproj */;
 				},
 				{
 					ProductGroup = B12BFDE222843ACC002E96E7 /* Products */;
@@ -1221,6 +1246,13 @@
 			remoteRef = ADBDB9261DFEBF0700ED6528 /* PBXContainerItemProxy */;
 			sourceTree = BUILT_PRODUCTS_DIR;
 		};
+		B11DDF3222897F8A00E46099 /* libRNSensors.a */ = {
+			isa = PBXReferenceProxy;
+			fileType = archive.ar;
+			path = libRNSensors.a;
+			remoteRef = B11DDF3122897F8A00E46099 /* PBXContainerItemProxy */;
+			sourceTree = BUILT_PRODUCTS_DIR;
+		};
 		B12BFDE622843ACC002E96E7 /* libRNSimpleCompass.a */ = {
 			isa = PBXReferenceProxy;
 			fileType = archive.ar;
@@ -1446,12 +1478,14 @@
 					"$(SRCROOT)/../node_modules/react-native-gesture-handler/ios/**",
 					"$(SRCROOT)/../node_modules/@react-native-community/slider/ios/**",
 					"$(SRCROOT)/../node_modules/react-native-simple-compass/ios",
+					"$(SRCROOT)/../node_modules/react-native-sensors/ios/**",
 				);
 				INFOPLIST_FILE = DirectionTests/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 9.0;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
 				LIBRARY_SEARCH_PATHS = (
 					"$(inherited)",
+					"\"$(SRCROOT)/$(TARGET_NAME)\"",
 					"\"$(SRCROOT)/$(TARGET_NAME)\"",
 				);
 				OTHER_LDFLAGS = (
@@ -1479,12 +1513,14 @@
 					"$(SRCROOT)/../node_modules/react-native-gesture-handler/ios/**",
 					"$(SRCROOT)/../node_modules/@react-native-community/slider/ios/**",
 					"$(SRCROOT)/../node_modules/react-native-simple-compass/ios",
+					"$(SRCROOT)/../node_modules/react-native-sensors/ios/**",
 				);
 				INFOPLIST_FILE = DirectionTests/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 9.0;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
 				LIBRARY_SEARCH_PATHS = (
 					"$(inherited)",
+					"\"$(SRCROOT)/$(TARGET_NAME)\"",
 					"\"$(SRCROOT)/$(TARGET_NAME)\"",
 				);
 				OTHER_LDFLAGS = (
@@ -1511,6 +1547,7 @@
 					"$(SRCROOT)/../node_modules/react-native-gesture-handler/ios/**",
 					"$(SRCROOT)/../node_modules/@react-native-community/slider/ios/**",
 					"$(SRCROOT)/../node_modules/react-native-simple-compass/ios",
+					"$(SRCROOT)/../node_modules/react-native-sensors/ios/**",
 				);
 				INFOPLIST_FILE = Direction/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
@@ -1537,6 +1574,7 @@
 					"$(SRCROOT)/../node_modules/react-native-gesture-handler/ios/**",
 					"$(SRCROOT)/../node_modules/@react-native-community/slider/ios/**",
 					"$(SRCROOT)/../node_modules/react-native-simple-compass/ios",
+					"$(SRCROOT)/../node_modules/react-native-sensors/ios/**",
 				);
 				INFOPLIST_FILE = Direction/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
@@ -1569,11 +1607,13 @@
 					"$(SRCROOT)/../node_modules/react-native-gesture-handler/ios/**",
 					"$(SRCROOT)/../node_modules/@react-native-community/slider/ios/**",
 					"$(SRCROOT)/../node_modules/react-native-simple-compass/ios",
+					"$(SRCROOT)/../node_modules/react-native-sensors/ios/**",
 				);
 				INFOPLIST_FILE = "Direction-tvOS/Info.plist";
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
 				LIBRARY_SEARCH_PATHS = (
 					"$(inherited)",
+					"\"$(SRCROOT)/$(TARGET_NAME)\"",
 					"\"$(SRCROOT)/$(TARGET_NAME)\"",
 				);
 				OTHER_LDFLAGS = (
@@ -1606,11 +1646,13 @@
 					"$(SRCROOT)/../node_modules/react-native-gesture-handler/ios/**",
 					"$(SRCROOT)/../node_modules/@react-native-community/slider/ios/**",
 					"$(SRCROOT)/../node_modules/react-native-simple-compass/ios",
+					"$(SRCROOT)/../node_modules/react-native-sensors/ios/**",
 				);
 				INFOPLIST_FILE = "Direction-tvOS/Info.plist";
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
 				LIBRARY_SEARCH_PATHS = (
 					"$(inherited)",
+					"\"$(SRCROOT)/$(TARGET_NAME)\"",
 					"\"$(SRCROOT)/$(TARGET_NAME)\"",
 				);
 				OTHER_LDFLAGS = (
@@ -1642,11 +1684,13 @@
 					"$(SRCROOT)/../node_modules/react-native-gesture-handler/ios/**",
 					"$(SRCROOT)/../node_modules/@react-native-community/slider/ios/**",
 					"$(SRCROOT)/../node_modules/react-native-simple-compass/ios",
+					"$(SRCROOT)/../node_modules/react-native-sensors/ios/**",
 				);
 				INFOPLIST_FILE = "Direction-tvOSTests/Info.plist";
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
 				LIBRARY_SEARCH_PATHS = (
 					"$(inherited)",
+					"\"$(SRCROOT)/$(TARGET_NAME)\"",
 					"\"$(SRCROOT)/$(TARGET_NAME)\"",
 				);
 				OTHER_LDFLAGS = (
@@ -1678,11 +1722,13 @@
 					"$(SRCROOT)/../node_modules/react-native-gesture-handler/ios/**",
 					"$(SRCROOT)/../node_modules/@react-native-community/slider/ios/**",
 					"$(SRCROOT)/../node_modules/react-native-simple-compass/ios",
+					"$(SRCROOT)/../node_modules/react-native-sensors/ios/**",
 				);
 				INFOPLIST_FILE = "Direction-tvOSTests/Info.plist";
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
 				LIBRARY_SEARCH_PATHS = (
 					"$(inherited)",
+					"\"$(SRCROOT)/$(TARGET_NAME)\"",
 					"\"$(SRCROOT)/$(TARGET_NAME)\"",
 				);
 				OTHER_LDFLAGS = (
