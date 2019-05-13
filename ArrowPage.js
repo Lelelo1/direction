@@ -438,6 +438,8 @@ class ArrowPage extends Component {
                         />
                     </View>
                     <Text style={{ fontSize: moderateScale(20) }}>{this.props.arrowPageModel.distance} meters</Text>
+                    <Text style={{ paddingTop: 20 }}>heading: {this.props.arrowPageModel.heading}</Text>
+                    <Text style={{ paddingTop: 20 }}>h: {this.props.arrowPageModel.h}</Text>
                 </View>
                 <View style={{ width: '93%', alignSelf: 'center' }}>
                     <View style={{ flexDirection: 'row', justifyContent: 'space-between' }}>
