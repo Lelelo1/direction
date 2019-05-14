@@ -4,7 +4,7 @@ import Utils from './Utils';
 import Calculate from './Caluclate';
 import Geolocation from 'react-native-geolocation-service';
 import { Attitude, Barometer } from 'react-native-attitude';
-
+import { deviceMotion } from 'react-native-sensors';
 
 export default class ArrowPageModel {
     static instance = null;
@@ -151,12 +151,11 @@ export default class ArrowPageModel {
     // for giving results where user is facing
     attitudeListener;
     headingListener;
+    lastYawVal;
+    lastRollVal;
     startAttitude() {
         this.attitudeListener = Attitude.watchAttitude((update) => {
-            /**
-             * update.roll (in degrees -180 (left) +180 (right))
-             * update.pitch (in degrees  -90 (down) +90 (up))
-            **/
+            /*
            console.log('update: ' + JSON.stringify(update));
             const r = Math.round(update.attitude.roll);
             const p = Math.round(update.attitude.pitch);
@@ -165,6 +164,24 @@ export default class ArrowPageModel {
             this.roll = r;
             this.pitch = p;
             this.yaw = y;
+            */
+        });
+         
+        deviceMotion.subscribe(({ gX, gY, gZ }) => {
+            console.log('gX: ' + gX + ' gY: ' + gY + ' gZ: ' + gZ);
+            const r = Math.round(gX * (180 / Math.PI));
+            const p = Math.round(gY * (180 / Math.PI));
+            const y = Math.round(gZ * (180 / Math.PI));
+            console.log('gyro roll: ' + r + ' pitch: ' + p + ' yaw: ' + y);
+            // this.roll = r;
+            // this.pitch = p;
+            
+            if (!this.lastYawVal) this.lastYawVal = y;
+            const yDif = Math.abs(this.lastYawVal - y);
+            if (yDif > 1) {
+                this.yaw = y;
+                this.lastYawVal = y;
+            }
         });
 
         /* uses compass activly
