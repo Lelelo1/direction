@@ -3,18 +3,27 @@ import RNSimpleCompass from 'react-native-simple-compass';
 import Utils from './Utils';
 import Calculate from './Caluclate';
 import Geolocation from 'react-native-geolocation-service';
-import { magnetometer, gyroscope, accelerometer, deviceMotion } from 'react-native-sensors';
+import { magnetometer, gyroscope, accelerometer, deviceMotion, SensorTypes, setUpdateIntervalForType } from 'react-native-sensors';
+/*
 import {
     FusionAhrs,
     FusionAhrsUpdate,
     FusionVector3,
     FusionCompassCalculateHeading
 } from "./AHRS-Sensors-Fusion-JS/FusionAhrs";
-
+*/
 import AHRS from 'ahrs';
 
-const madgwick = new AHRS({ sampleInterval: 20, algorithm: 'Madgwick', beta: 0.4 });
-
+// sampleInterval: 0.03925199992954731
+// 39.25199992954731 
+// beta 8. 7 8
+const updateRate = 0.10;
+const madgwick = new AHRS({ sampleInterval: updateRate, algorithm: 'Madgwick', beta: 0.4 });
+// 23 sec 15 sec with 5 beta
+// 15 sec 16 sec with 8 beta
+// 13 sec 17 sec with 12 beta
+// 18 sec 18 sec with 15 beta
+// and with 
 export default class ArrowPageModel {
     static instance = null;
 
@@ -26,7 +35,7 @@ export default class ArrowPageModel {
     }
 
     isShowingDirection = false; // used by 
-
+    // 5
     destination = { latitude: -1, longitude: -1 };
 
     // const degree_update_rate = 3; // Number of degrees changed before the callback is triggered
@@ -55,7 +64,12 @@ export default class ArrowPageModel {
     aZ;
 
     lastH;
+    lastG;
+    lastTime = 0;
+    timeDif;
+    interval;
     startCompass() { // May need to write stabilising solution // undvik compass reading om inte rört telefonen // men om står vid en avikelse 
+        // compass match ahrs but not when device is started upside down ahrs points the opposite way
         /*
         const degreeUpdateRate = 3;
         RNSimpleCompass.start(degreeUpdateRate, (degree) => {
@@ -79,18 +93,27 @@ export default class ArrowPageModel {
                 }
             }
         });
-        console.log('started compass');
         */
+       const rate = updateRate * 1000; // s to ms 
+       // setUpdateIntervalForType(SensorTypes.deviceMotion, 10); // does not go faster than 10 ms - cretes bridge probelem aswell
+       setUpdateIntervalForType(SensorTypes.accelerometer, rate);
+       setUpdateIntervalForType(SensorTypes.gyroscope, rate);
+       setUpdateIntervalForType(SensorTypes.magnetometer, rate);
        
-        // don't use uncalibrated
-        
+        setUpdateIntervalForType(SensorTypes.deviceMotion, rate);
+        // don't use uncalibrated indeed - gived heading depening on phone is orientated when starting
+        /*
         magnetometer.subscribe(({ x, y, z, timestamp }) => {
-            // console.log('mX: ' + x + 'mY: ' + y + 'mZ: ' + z);
-            this.mX = x;
-            this.mY = y;
+            console.log('mX: ' + x + 'mY: ' + y + 'mZ: ' + z);
+            // console.log('magnetometer timestamp: ' + timestamp);
+            this.timeDif = (timestamp - this.lastTime);
+            this.mX = y;
+            this.mY = x; // putting negatie doesnt help
             this.mZ = z;
-
-            // all sensors has given data
+            this.lastTime = timestamp;
+            
+            const m = Math.sqrt((x * x) + (y * y) + (z * z));
+            console.log('magnetometer: ' + m);
             if (this.mX && this.mY && this.mZ &&
                 this.gX && this.gY && this.gZ &&
                  this.aX && this.aY && this.aZ) {
@@ -121,55 +144,112 @@ export default class ArrowPageModel {
                    }
                  }
         });
+        */
+       // 1 min 30 sec
+       // 40
+       // 1 min 35 sec
+       // 15 sec yes yes when starting 
+       // 1 min 44 sec
+       // 113 sev
+       // 1 min 20 sec
+       // 1:20
+       // 1:10
+        // CMAttitudeReferenceFrameXArbitraryCorrectedZVertical
+        // gives magnetometer of: 8.20421028137207mY: 7.451621055603027mZ: -47.280086517333984. 8.122105598449707mY: 7.295114040374756mZ: -47.91471481323242. 8.78625202178955mY: 7.604227066040039mZ: -47.45717239379883
+        // CMAttitudeReferenceFrameXTrueNorthZVertical
+        // gives:  8.806000709533691mY: 7.5612993240356445mZ: -48.515380859375. 9.012178421020508mY: 7.593038558959961mZ: -48.88633346557617. 8.808220863342285mY: 7.007899761199951mZ: -48.52046203613281
+
+        // CMAttitudeReferenceFrameXArbitraryCorrectedZVertical && CMAttitudeReferenceFrameXMagneticNorthZVertical snabb
+        // CMAttitudeReferenceFrameXTrueNorthZVertical seg vid uppstart
+
+        deviceMotion.subscribe(({ mX, mY, mZ, gX, gY, gZ, aX, aY, aZ, timestamp }) => {
+            console.log('mX: ' + mX + 'mY: ' + mY + 'mZ: ' + mZ);
+            // console.log('magnetometer timestamp: ' + timestamp);
+            this.timeDif = (timestamp - this.lastTime);
+            const m = Math.sqrt((mX * mY) + (mY * mY) + (mZ * mZ));
+            console.log('mag: ' + m); // 48.452443774749334 uT 
+            
+            this.mX = mY;
+            this.mY = mX;
+            this.mZ = mZ;
+            
+            this.aX = aY;
+            this.aY = aX;
+            this.aZ = aZ;
+            
+            this.gX = -gY;
+            this.gY = -gX; 
+            this.gZ = -gZ; 
+                        
+
+            this.lastTime = timestamp;
+            
+            if (this.mX && this.mY && this.mZ &&
+                this.gX && this.gY && this.gZ &&
+                 this.aX && this.aY && this.aZ) {
+                   const h = this.getHeading();
+                   if (this.isShowingDirection) { // fires every time magnet change
+                       if (!this.lastVal) this.lastVal = h;
+                       const valDif = Math.abs(this.lastVal - h);
+                       if (valDif >= 1) {
+                           this.showTheWay(h);
+                           this.heading = Math.round(h);
+                           this.lastVal = h;
+                       }
+                   } else { // this.isShowingResultsWhereFacing
+                       // fire every 20 degree change or something
+                       // ...
+                       // --> changes this.location updates googleplacesautocomplete
+                       // stops when closing listview
+                       
+                   }
+                   if (this.shouldCalculatePointWhereFacing) {
+                       if (!this.lastVal) this.lastVal = h;
+                       const valDif = Math.abs(this.lastVal - h);
+                       if (valDif >= 15) {
+                           console.log('turned 15 degree or more');
+                           this.showResultsWhereFacing(h);
+                           this.lastVal = h;
+                       }
+                   }
+                 }
+                 
+        });
         
         /*
-        deviceMotion.subscribe(({ mX, mY, mZ, aX, aY, aZ, gX, gY, gZ, timestamp }) => {
+        gyroscope.subscribe(({ x, y, z, timestamp }) => {
+            // console.log('gX: ' + x + ' gY: ' + y + ' gZ: ' + z);
             
-            console.log('mX: ' + mX + ' mY: ' + mY + ' mZ: ' + mZ +
-                ' aX: ' + aX + ' aY: ' + aY + ' aZ: ' + aZ +
-                ' gX: ' + gX + ' gY: ' + gY + ' gZ: ' + gZ);
+            this.gX = x * (180 / Math.PI);
+            this.gY = y * (180 / Math.PI);
+            this.gZ = z * (180 / Math.PI);
             
-
-            // this.mX = mX;
-            // this.mY = mY;
-            // this.mZ = mZ;
             
-            this.aX = aX;
-            this.aY = aY;
-            this.aZ = aZ;
-
-            this.gX = gX;
-            this.gY = gY;
-            this.gZ = gZ;
+           this.gX = -y;
+           this.gY = -x;
+           this.gZ = -z;
+           
             
-            const d = gZ * (180/Math.PI);
-            if (!this.lastH) this.lastH = d;
-            const hDif = Math.abs(this.lastH - d);
-            if (hDif >= 1) {
-                this.h = Math.round(d);
-                this.lastH = d;
+             is raw gyroscope in radians per second: https://github.com/psiphi75/ahrs/issues/9
+            const d = z * (180 / Math.PI);
+            if (!this.lastG) this.lastG = d;
+            const gDif = Math.abs(this.lastG - d);
+            if (gDif >= 1) {    
+                this.gZ = Math.round(d);
+                this.lastG = d;
             }
-
             
         });
         */
-        
-        gyroscope.subscribe(({ x, y, z, timestamp }) => {
-            // console.log('gX: ' + x);
-            this.gX = x;
-            this.gY = y;
-            this.gZ = z;
-
-        });
-        
-        
+        /*
         accelerometer.subscribe(({ x, y, z, timestamp }) => {
             // console.log({ x, y, z, timestamp })
-            this.aX = x;
-            this.aY = y;
+            // console.log('aX: ' + x + ' aY: ' + y + ' aZ: ' + z);
+            this.aX = y;
+            this.aY = x;
             this.aZ = z;
         });
-        
+        */
         /*
         console.log(JSON.stringify(FusionVector3));
         let v = JSON.parse(FusionVector3);
@@ -177,6 +257,7 @@ export default class ArrowPageModel {
         console.log(JSON.stringify(v));
         */
     }
+    
     getHeading() {
 
         /* spinning inaccurate not updating - with device motion completely off not updating when turning https://github.com/xonoxitron/AHRS-Sensors-Fusion-JS
@@ -203,22 +284,30 @@ export default class ArrowPageModel {
         // FusionAhrsUpdate(fusionAhrs, gyroscope, accelerometer, FUSION_VECTOR3_ZERO, 0.01); // alternative function call to ignore magnetometer
         // FusionAhrsUpdate(fusionAhrs, gyroscope, FUSION_VECTOR3_ZERO, FUSION_VECTOR3_ZERO, 0.01); // alternative function call to ignore accelerometer and magnetometer
         */
-        madgwick.update(this.gX, this.gY, this.gZ, this.aX, this.aY, this.aZ, this.mX, this.mY, this.mZ);
-        let heading = madgwick.getEulerAnglesDegrees().heading;
+        console.log('timedif: ' + this.timeDif);
+        // device motion updates stops when app is put in background. react-native-sensors stop sgetting data so the madgwickupdate does not run
+        madgwick.update(this.gX, this.gY, this.gZ, this.aX, this.aY, this.aZ, this.mX, this.mY, this.mZ, updateRate);
+        // let heading = madgwick.getEulerAnglesDegrees().heading;
+        // https://stackoverflow.com/questions/5782658/extracting-yaw-from-a-quaternion
+        const q = madgwick.getQuaternion();
+        let heading = Math.atan2(2.0*(q.x*q.y + q.w*q.z), q.w*q.w + q.x*q.x - q.y*q.y - q.z*q.z);
+        heading *= (180 / Math.PI); 
+        // console.log('quaternion: ' + JSON.stringify(q));
+        
         heading %= 360;
-
         if (heading < 0) {
             heading += 360;
         }
-        console.log('heading: ' + heading);
+        
         return heading;
     }
+    
     // heading from ahrs is counter-clockwise https://github.com/psiphi75/ahrs#readme while degree from simple-compass is clockwise
     // (360 - degree)
     showTheWay(degree) {
         try {
             Geolocation.getCurrentPosition((position) => {
-                this.setRotate(270 - degree); // Calculate.bearing(position.coords.latitude, position.coords.longitude, this.destination.latitude, this.destination.longitude)
+                this.setRotate(270 + degree);  // Calculate.bearing(position.coords.latitude, position.coords.longitude, this.destination.latitude, this.destination.longitude)  // degree positive when using ahrs
                 this.distance = Math.round(Calculate.distance(position.coords.latitude, position.coords.longitude,
                     this.destination.latitude, this.destination.longitude));
             }, (error) => { console.warn(error); /* show unable to locate icon bad connection */ }, { maximumAge: 1000, enableHightAccuracy: true, distanceFilter: 10 });
@@ -231,7 +320,7 @@ export default class ArrowPageModel {
     showResultsWhereFacing(degree) {
         try {
             Geolocation.getCurrentPosition((position) => {
-                this.locationAhead = Calculate.FindPointAtDistanceFrom(position.coords.latitude, position.coords.longitude, degree, this.getRadius());
+                this.locationAhead = Calculate.FindPointAtDistanceFrom(position.coords.latitude, position.coords.longitude, -degree, this.getRadius()); // degree negative when using ahrs
                 console.log('Found point: ' + JSON.stringify(this.location));
             }, (error) => { console.warn(error); /* show unable to locate icon bad connection */ }, { maximumAge: 300000 }); // 5 min
         } catch (exception) {
@@ -242,6 +331,7 @@ export default class ArrowPageModel {
 
     stopCompass() {
         RNSimpleCompass.stop();
+        clearInterval(this.interval);
         console.log('stopped compass');
     }
 
@@ -316,5 +406,6 @@ decorate(ArrowPageModel, {
     isShowingResultsWhereFacing: observable,
     locationAhead: observable,
     heading: observable,
-    h: observable
+    h: observable,
+    gZ: observable
 });
